@@ -14,11 +14,11 @@ This document outlines the application architecture for the AI PM Assistant PoC,
 
 ## High‑Level System Diagram
 
-```
+```mermaid
 flowchart TD
     U[User] --> UI[Next.js App Router UI]
-    subgraph Next.js App (Web + API)
-      UI -->|Text / Upload| API[/Route Handlers (api/*)/]
+    subgraph "Next.js App (Web + API)"
+      UI -->|Text / Upload| API[Route Handlers]
       API --> Auth[NextAuth.js]
       API --> SVC[Application Services]
     end
@@ -30,7 +30,7 @@ flowchart TD
     SVC --> ZIP[Export/Zip Service]
     ZIP --> OBJ[(Object Storage)]
     ZIP --> UI
-    UI <-->|SSE/stream| API
+    UI <-->|SSE stream| API
 ```
 
 Notes:
