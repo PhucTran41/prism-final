@@ -14,7 +14,7 @@ This document outlines the application architecture for the AI PM Assistant PoC,
 
 ## High‑Level System Diagram
 
-```mermaid
+```
 flowchart TD
     U[User] --> UI[Next.js App Router UI]
     subgraph Next.js App (Web + API)
