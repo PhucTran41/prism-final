@@ -18,6 +18,12 @@ export default async function ProjectBriefPage({ params }: { params: Promise<{ p
     );
   }
   const cookieHeader = (await headers()).get("cookie") ?? "";
+  const resProject = await fetch(`${process.env.NEXTAUTH_URL ?? ""}/api/projects/${projectId}`, {
+    cache: "no-store",
+    headers: { cookie: cookieHeader },
+  }).catch(() => undefined);
+  const projectData = resProject ? await resProject.json().catch(() => ({})) : {};
+  const projectName: string | undefined = projectData?.name ?? projectData?.project?.name ?? undefined;
   const res = await fetch(`${process.env.NEXTAUTH_URL ?? ""}/api/projects/${projectId}/brief`, {
     cache: "no-store",
     headers: { cookie: cookieHeader },
@@ -30,7 +36,7 @@ export default async function ProjectBriefPage({ params }: { params: Promise<{ p
       <div className="mb-6 space-y-2">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">Project Brief</h1>
-          <div className="flex items-center gap-2">{md ? <CopyButton content={md} /> : <GenerateBriefForm projectId={projectId} />}</div>
+          <div className="flex items-center gap-2">{md ? <CopyButton content={md} /> : <GenerateBriefForm projectId={projectId} projectName={projectName ?? "Project"} />}</div>
         </div>
         <p className="text-sm text-muted-foreground">
           A concise, AI‑generated overview of your project’s problem, target users, goals, constraints, and MVP scope.

@@ -22,10 +22,6 @@ export function CreateProjectForm() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [problem, setProblem] = useState("");
-  const [targetUser, setTargetUser] = useState("");
-  const [goals, setGoals] = useState("");
-  const [constraints, setConstraints] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -36,30 +32,18 @@ export function CreateProjectForm() {
       case "campus-food":
         setName("Campus Food Finder");
         setDescription("A student‑focused app to discover affordable, nearby meals in minutes.");
-        setProblem("Students waste time and money finding decent meals on or around campus.");
-        setTargetUser("University students and staff who need quick, affordable options.");
-        setGoals("Reduce search time; improve decision confidence; track preferences.");
-        setConstraints("2‑week MVP; one developer; iOS Safari + Chrome mobile first.");
         break;
       case "saas-analytics":
         setName("Pulse Analytics");
         setDescription("Self‑serve analytics for small SaaS teams with zero setup.");
-        setProblem("Early SaaS teams struggle to get reliable product metrics without costly data stacks.");
-        setTargetUser("Seed‑stage SaaS founders and PMs.");
-        setGoals("Ship dashboards in 1 day; surface retention and feature usage; alert on anomalies.");
-        setConstraints("MVP web only; Postgres; privacy‑friendly.");
         break;
       case "fitness-tracker":
         setName("MicroHabit Fit");
         setDescription("Daily micro‑habits for busy people to stay active in 5 minutes.");
-        setProblem("People fail to maintain workout routines due to time and motivation.");
-        setTargetUser("Busy professionals seeking quick, trackable activities.");
-        setGoals("Increase streaks; gentle reminders; share progress.");
-        setConstraints("Mobile web MVP; notifications later.");
         break;
       case "none":
         // reset
-        setName(""); setDescription(""); setProblem(""); setTargetUser(""); setGoals(""); setConstraints("");
+        setName(""); setDescription("");
         break;
     }
     setTemplate(key);
@@ -167,53 +151,6 @@ export function CreateProjectForm() {
             {fieldErrors.description ? <p className="text-xs text-red-600">{fieldErrors.description}</p> : null}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="problem">Problem</Label>
-            <Textarea
-              id="problem"
-              rows={3}
-              value={problem}
-              onChange={(e)=>setProblem(e.target.value)}
-              placeholder="What problem are you solving?"
-            />
-            <p className="text-xs text-muted-foreground">{problem.length}/500</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="target">Target users</Label>
-            <Textarea
-              id="target"
-              rows={3}
-              value={targetUser}
-              onChange={(e)=>setTargetUser(e.target.value)}
-              placeholder="Who is this for?"
-            />
-            <p className="text-xs text-muted-foreground">{targetUser.length}/500</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="goals">Goals</Label>
-            <Textarea
-              id="goals"
-              rows={3}
-              value={goals}
-              onChange={(e)=>setGoals(e.target.value)}
-              placeholder="What do you want to achieve?"
-            />
-            <p className="text-xs text-muted-foreground">{goals.length}/500</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="constraints">Constraints</Label>
-            <Textarea
-              id="constraints"
-              rows={3}
-              value={constraints}
-              onChange={(e)=>setConstraints(e.target.value)}
-              placeholder="Time, budget, team, tech constraints"
-            />
-            <p className="text-xs text-muted-foreground">{constraints.length}/500</p>
-          </div>
         </CardContent>
 
         <CardFooter className="flex items-center gap-2">
