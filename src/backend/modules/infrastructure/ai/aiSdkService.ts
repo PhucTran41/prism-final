@@ -12,6 +12,8 @@ export type AiGenerateParams = {
   prompt: string;
   baseUrl?: string;
   apiKey?: string;
+  temperature?: number;
+  topP?: number;
 };
 
 export type AiChatParams = {
@@ -41,6 +43,8 @@ export class AiSdkService {
     const { text, response } = await generateText({
       model: getLanguageModel(modelId),
       prompt: params.prompt,
+      temperature: params.temperature,
+      topP: params.topP,
     });
     return { text, raw: response };
   }

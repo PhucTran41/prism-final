@@ -1,0 +1,12 @@
+name: helper-summarize-brief
+version: 1
+template: |
+  {{ system }}
+  Task: Summarize the following Project Brief into at most 12 bullets (≤ 16 words each).
+  - Keep the essence of Problem, Audience, Goals, Constraints, and MVP focus.
+  - No section headings, just a bullet list.
+
+  Brief:
+  {{ brief }}
+
+

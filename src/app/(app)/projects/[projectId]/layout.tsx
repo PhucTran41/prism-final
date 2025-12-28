@@ -3,7 +3,7 @@ import { AppSidebar } from "@/src/frontend/components/layout/AppSideBar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/backend/modules/presentation/auth/handlers";
 import { headers } from "next/headers";
-import { FileTextIcon } from "lucide-react";
+import { Brain, FileTextIcon, ListTodo, Map, Settings, ShieldCheck, Users } from "lucide-react";
 
 export default async function ProjectLayout({
   children,
@@ -13,7 +13,15 @@ export default async function ProjectLayout({
   params: Promise<{ projectId: string }>;
 }) {
   const { projectId } = await params;
-  const items = [{ title: "Project Brief", href: `/projects/${projectId}/brief`, icon: <FileTextIcon /> }];
+  const items = [
+    { title: "Project Brief", href: `/projects/${projectId}/brief`, icon: <FileTextIcon /> },
+    { title: "Scope & Features", href: `/projects/${projectId}/scope`, icon: <Brain /> },
+    { title: "Epics & Stories", href: `/projects/${projectId}/epics`, icon: <ListTodo /> },
+    { title: "Roadmap", href: `/projects/${projectId}/roadmap`, icon: <Map /> },
+    { title: "Assumptions & Risks", href: `/projects/${projectId}/assumptions`, icon: <ShieldCheck /> },
+    { title: "Members", href: `/projects/${projectId}/members`, icon: <Users /> },
+    { title: "Settings", href: `/projects/${projectId}/settings`, icon: <Settings /> },
+  ];
 
   const session = await getServerSession(authOptions);
   const user =

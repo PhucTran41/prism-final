@@ -1,0 +1,38 @@
+name: scope-features-template
+version: 1
+template: |
+  You are an expert product manager. Using the provided Project Brief, write a crisp "Scope & Features" document for the MVP.
+
+  Project: {{ name }}
+
+  Project Brief:
+  {{ brief }}
+
+  If the brief is short or missing sections, infer sensible defaults, but keep text specific and actionable.
+
+  Requirements and hints (optional):
+  - Goals: {{ goals }}
+  - Must-have: {{ must }}
+  - Should-have: {{ should }}
+  - Could-have: {{ could }}
+  - Non-goals / Out of scope: {{ non_goals }}
+
+  Produce Markdown with the following sections:
+  # Scope & Features
+  ## Goals
+  - …
+  ## Non-Goals
+  - …
+  ## Feature Breakdown
+  ### Must-have (M)
+  - …
+  ### Should-have (S)
+  - …
+  ### Could-have (C)
+  - …
+  ## Constraints & Assumptions
+  - …
+  ## Acceptance Criteria (high-level)
+  - …
+
+

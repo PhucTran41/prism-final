@@ -1,0 +1,46 @@
+name: task-generate-scope
+version: 1
+template: |
+  {{ system }}
+
+  Task: Create a "Scope & Features" document for "{{ name }}".
+  Strictness: {{ strictness }}
+
+  Use this Project Brief for context:
+  {{ brief }}
+
+  Optional guidance:
+  - Goals: {{ goals }}
+  - Must: {{ must }}
+  - Should: {{ should }}
+  - Could: {{ could }}
+  - Non-goals: {{ non_goals }}
+
+  Apply this rubric:
+  {{ rubric }}
+
+  Output caps:
+  - ≤ 1200 words total
+  - ≤ 7 bullets per list, bullets ≤ 16 words
+  - Ban phrases: streamline workflows, drive engagement, robust, scalable, innovative, cutting-edge
+  - Each Must maps to a Goal or Problem statement
+  - If guidance is missing, infer a plausible default and mark with [assumed]
+  Output format (Markdown):
+  # Scope & Features
+  ## Goals
+  - ...
+  ## Non-Goals
+  - ...
+  ## Feature Breakdown
+  ### Must-have (M)
+  - ...
+  ### Should-have (S)
+  - ...
+  ### Could-have (C)
+  - ...
+  ## Constraints & Assumptions
+  - ...
+  ## Acceptance Criteria (high-level)
+  - ...
+
+

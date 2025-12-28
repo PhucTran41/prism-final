@@ -1,0 +1,37 @@
+name: task-generate-brief
+version: 1
+template: |
+  {{ system }}
+
+  Task: Write a concise Project Brief for "{{ name }}".
+  Strictness: {{ strictness }}
+
+  Inputs:
+  - Problem: {{ problem }}
+  - Target users: {{ targetUser }}
+  - Goals: {{ goals }}
+  - Constraints: {{ constraints }}
+
+  Apply this rubric:
+  {{ rubric }}
+
+  Output format (Markdown) — caps:
+  - ≤ 900 words total
+  - ≤ 7 bullets per list, bullets ≤ 16 words
+  - Ban phrases: streamline workflows, drive engagement, robust, scalable, innovative, cutting-edge
+  - If an input is missing, infer a plausible default and mark it with [assumed]
+  - Do not repeat content from the Brief in other sections verbatim
+  Output format (Markdown):
+  # Project Brief: {{ name }}
+  ## Problem
+  ...
+  ## Target Users
+  ...
+  ## Goals
+  - ...
+  ## Constraints
+  - ...
+  ## Scope (MVP)
+  ...
+
+

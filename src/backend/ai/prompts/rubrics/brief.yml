@@ -1,0 +1,12 @@
+name: rubric-brief
+version: 1
+template: |
+  Use this checklist while writing:
+  - Problem is specific to the audience and avoids buzzwords.
+  - Target users describe roles/segments, not “everyone”.
+  - Goals are outcome-oriented (measurable where possible).
+  - Constraints are concrete (timeline, team, tech).
+  - Scope (MVP) states what is included at first and what is not.
+  - Document stays under 700–900 words; no long prose blocks.
+
+

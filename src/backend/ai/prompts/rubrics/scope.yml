@@ -1,0 +1,12 @@
+name: rubric-scope
+version: 1
+template: |
+  Use this checklist while writing:
+  - Goals reflect value outcomes, not features.
+  - Non-goals explicitly call out what is excluded.
+  - Must/Should/Could features are prioritized and testable.
+  - Each feature has a brief intent; avoid implementation-level detail.
+  - Constraints and assumptions are realistic and derived from the brief.
+  - Document fits on one page; avoid redundancy with the Brief.
+
+
