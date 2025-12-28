@@ -130,6 +130,15 @@ modules/
 └─ roadmap/
 ```
 
+Cross-module presentation (shared handlers like authentication):
+
+```text
+modules/
+└─ presentation/
+   └─ auth/
+      └─ handlers.ts
+```
+
 Module structure:
 
 ```text

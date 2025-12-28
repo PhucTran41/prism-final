@@ -1,0 +1,76 @@
+// Datasource and generator
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Enums
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+// Models (minimal MVP subset)
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String?
+  projects  Project[] @relation("UserProjects")
+  members   ProjectMember[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Project {
+  id          Int             @id @default(autoincrement())
+  ownerId     Int
+  owner       User            @relation("UserProjects", fields: [ownerId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  status      ProjectStatus   @default(DRAFT)
+  documents   Document[]
+  members     ProjectMember[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  deletedAt   DateTime?
+
+  @@index([ownerId, createdAt])
+}
+
+model ProjectMember {
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  userId    Int
+  role      String  // e.g. MEMBER, OWNER (flexible for future)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@unique([projectId, userId])
+  @@index([userId])
+}
+
+model Document {
+  id            Int          @id @default(autoincrement())
+  projectId     Int
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type          String
+  title         String
+  latestVersion Int          @default(0)
+  contentMd     String?      @db.Text
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  deletedAt     DateTime?
+
+  @@unique([projectId, type])
+  @@index([projectId, updatedAt])
+}
+
+

@@ -1,0 +1,38 @@
+import NextAuth from 'next-auth';
+import Google from 'next-auth/providers/google';
+import { AppConfig } from '@/src/config/AppConfig';
+import { prismaClient } from '@/src/backend/shared/infrastructure/prisma';
+
+const handler = NextAuth({
+  providers: [
+    Google({
+      clientId: AppConfig.google.clientId,
+      clientSecret: AppConfig.google.clientSecret,
+    }),
+  ],
+  session: { strategy: 'jwt' },
+  secret: AppConfig.auth.secret,
+  pages: {
+    signIn: '/login',
+  },
+  callbacks: {
+    async signIn({ user }: { user?: { email?: string | null; name?: string | null } }) {
+      if (!user?.email) return false;
+      await prismaClient.user.upsert({
+        where: { email: user.email },
+        update: { name: user.name ?? null },
+        create: {
+          email: user.email,
+          name: user.name ?? null,
+        },
+      });
+      return true;
+    },
+  },
+});
+
+export { handler as GET, handler as POST };
+
+
+
+
