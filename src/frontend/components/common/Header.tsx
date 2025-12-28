@@ -29,7 +29,11 @@ import { ThemeToggle } from "@/src/frontend/components/common/ThemeToggle";
 import { Menu, X } from "lucide-react";
 import { PrismLogo } from "@/src/frontend/components/common/PrismLogo";
 
-export function Header() {
+type HeaderProps = {
+  projectName?: string;
+};
+
+export function Header({ projectName }: HeaderProps) {
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
   // const isAdmin = session?.organization?.type === "admin";
@@ -57,9 +61,10 @@ export function Header() {
     <header className="border-b">
       <div className="mx-auto w-full px-4 flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center" aria-label="Prism Home">
+          <Link href="/" className="flex items-center text-primary" aria-label="Prism Home">
             <PrismLogo size={24} withWordmark />
           </Link>
+          {/* Project name should appear in AppSidebar header, not here */}
           
           {/* Desktop Navigation - Hidden on Mobile */}
           <div className="hidden md:block">

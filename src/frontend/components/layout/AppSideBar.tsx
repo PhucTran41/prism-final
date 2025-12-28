@@ -4,12 +4,10 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/src/frontend/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/frontend/components/ui/avatar";
 import { Button } from "@/src/frontend/components/ui/button";
 import { ScrollArea } from "@/src/frontend/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/src/frontend/components/ui/sheet";
 import { ChevronDown, ChevronRight, Menu, PanelLeftClose, PanelLeft } from "lucide-react";
-import { ThemeToggle } from "@/src/frontend/components/common/ThemeToggle";
 
 interface SidebarProps {
   user?: {
@@ -102,13 +100,6 @@ export function AppSidebar({
     }
   };
 
-  const userInitials = user?.name
-    ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-    : "U";
-    
   // If not mounted yet, return a simple loading state or nothing
   if (!isMounted) {
     return <div className="hidden md:block relative" />;
@@ -120,66 +111,14 @@ export function AppSidebar({
       <div className="hidden md:block relative">
         <aside 
           className={cn(
-            "h-screen flex-col fixed inset-y-0 z-50 transition-all duration-300",
+            "h-[calc(100vh-4rem)] flex-col fixed top-16 bottom-0 z-50 transition-all duration-300",
             collapsed ? "w-20" : "w-64"
           )}
         >
-          <div className="border-r bg-card h-full flex flex-col">
-            {/* Logo/Icon that links to landing page */}
-            <div className="flex h-14 items-center px-4 py-4 border-b justify-center">
-              <Link href="/" className="flex items-center justify-center">
-                {collapsed ? (
-                  <span className="text-xl font-bold" aria-label="Prism">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                    >
-                      <path d="M12 3L3 19h18L12 3Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-                      <path d="M12 3v16M3 19l9-5m9 5l-9-5" stroke="currentColor" strokeOpacity="0.55" strokeWidth="1.2" />
-                    </svg>
-                  </span>
-                ) : (
-                  <span className="text-base font-semibold flex items-center gap-2" aria-label="Prism">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                    >
-                      <path d="M12 3L3 19h18L12 3Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-                      <path d="M12 3v16M3 19l9-5m9 5l-9-5" stroke="currentColor" strokeOpacity="0.55" strokeWidth="1.2" />
-                    </svg>
-                    Prism
-                  </span>
-                )}
-              </Link>
-            </div>
-            
-            {/* User Profile */}
-            <div className={cn(
-              "flex items-center border-b",
-              collapsed ? "justify-center py-4" : "gap-3 px-4 py-3"
-            )}>
-              <Avatar className="h-9 w-9">
-                <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-                <AvatarFallback>{userInitials}</AvatarFallback>
-              </Avatar>
-              {!collapsed && (
-                <div className="flex flex-col flex-1">
-                  <p className="text-sm font-medium">{user?.name || "User"}</p>
-                  <p className="text-xs text-muted-foreground">{user?.email || "user@example.com"}</p>
-                </div>
-              )}
-            </div>
-            {/* Project Summary */}
+          <div className="border-r bg-background h-full flex flex-col">
+            {/* Simple header showing project name - hidden when collapsed to avoid awkward spacing */}
             {!collapsed && (
-              <div className="px-4 py-3 border-b">
+              <div className="border-b px-4 py-3">
                 <p className="text-xs text-muted-foreground">Project</p>
                 <p className="text-sm font-medium truncate">{project?.name ?? "Untitled project"}</p>
               </div>
@@ -187,10 +126,8 @@ export function AppSidebar({
 
             {/* Navigation */}
             <ScrollArea className="flex-1">
-              <div className={cn("py-2", collapsed ? "px-2" : "px-3")}>
-                {!collapsed && (
-                  <h3 className="mb-2 px-4 text-xs font-medium text-muted-foreground">Platform</h3>
-                )}
+              <div className={cn("py-2", collapsed ? "px-1" : "px-3")}>
+                {!collapsed && <h3 className="mb-2 px-4 text-xs font-medium text-muted-foreground">Platform</h3>}
                 <nav className="space-y-1">
                   {items.map((item) => {
                     const isActive = item.href ? pathname === item.href : false;
@@ -290,32 +227,25 @@ export function AppSidebar({
               </div>
             </ScrollArea>
             
-            {/* Sign Out Button */}
-            {onSignOut && (
-              <div className={cn("border-t", collapsed ? "p-2" : "p-4")}>
-                <div className={cn("flex", collapsed ? "flex-col items-center gap-2" : "justify-between items-center")}>
-                  <ThemeToggle className={collapsed ? "mb-2" : ""} />
-                  <Button 
-                    variant="outline" 
-                    className={cn(
-                      collapsed ? "w-10 h-10 mx-auto p-0" : "flex-1 ml-2"
-                    )}
-                    onClick={onSignOut}
-                    title={collapsed ? "Sign Out" : undefined}
-                  >
+            {/* Footer actions */}
+            <div className={cn("border-t", collapsed ? "p-2" : "p-4")}>
+              <div className={cn("flex", collapsed ? "flex-col items-center gap-2" : "justify-between items-center")}>
+                <Button variant="outline" asChild className={cn(collapsed ? "w-10 h-10 mx-auto p-0" : "w-full")}>
+                  <Link href="/projects" title={collapsed ? "All projects" : undefined}>
                     {collapsed ? (
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                        <path d="M15 3h4a2 2 0 0 1 2 2v4" />
+                        <path d="M21 3l-7 7" />
+                        <path d="M3 15v4a2 2 0 0 0 2 2h4" />
+                        <path d="M3 21l7-7" />
                       </svg>
                     ) : (
-                      "Sign Out"
+                      "Back to all projects"
                     )}
-                  </Button>
-                </div>
+                  </Link>
+                </Button>
               </div>
-            )}
+            </div>
           </div>
         </aside>
         
@@ -325,7 +255,7 @@ export function AppSidebar({
           size="icon" 
           onClick={toggleSidebar} 
           className={cn(
-            "fixed top-4 z-50 shadow-md border bg-background transition-all duration-300",
+            "fixed top-20 z-50 shadow-md border bg-background transition-all duration-300",
             collapsed ? "left-24" : "left-[270px]"
           )}
         >
@@ -334,7 +264,7 @@ export function AppSidebar({
       </div>
       
       {/* Mobile Sidebar Button */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
+      <div className="md:hidden fixed top-20 left-4 z-50">
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="shadow-md">
@@ -344,29 +274,7 @@ export function AppSidebar({
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0">
             <div className="border-r bg-card h-full flex flex-col">
-              {/* App Title */}
-              <div className="flex h-14 items-center px-4 py-4 border-b justify-center">
-                <Link href="/" className="flex items-center gap-2">
-                  <span className="text-base font-semibold">Prism</span>
-                </Link>
-              </div>
-              
-              {/* User Profile */}
-              <div className="flex items-center gap-3 px-4 py-3 border-b">
-                <Avatar className="h-9 w-9">
-                  <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-                  <AvatarFallback>{userInitials}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col flex-1">
-                  <p className="text-sm font-medium">{user?.name || "User"}</p>
-                  <p className="text-xs text-muted-foreground">{user?.email || "user@example.com"}</p>
-                </div>
-              </div>
-            {/* Project Summary (mobile) */}
-            <div className="px-4 py-3 border-b">
-              <p className="text-xs text-muted-foreground">Project</p>
-              <p className="text-sm font-medium truncate">{project?.name ?? "Untitled project"}</p>
-            </div>
+              {/* No header/logo in mobile sidebar */}
               
               {/* Navigation */}
               <ScrollArea className="flex-1">
@@ -444,21 +352,14 @@ export function AppSidebar({
                 </div>
               </ScrollArea>
               
-              {/* Sign Out Button */}
-              {onSignOut && (
-                <div className="p-4 border-t">
-                  <div className="flex justify-between items-center">
-                    <ThemeToggle />
-                    <Button 
-                      variant="outline" 
-                      className="flex-1 ml-2" 
-                      onClick={onSignOut}
-                    >
-                      Sign Out
-                    </Button>
-                  </div>
+              {/* Footer actions */}
+              <div className="p-4 border-t">
+                <div className="flex justify-between items-center">
+                  <Button variant="outline" asChild className="flex-1">
+                    <Link href="/projects">Back to all projects</Link>
+                  </Button>
                 </div>
-              )}
+              </div>
             </div>
           </SheetContent>
         </Sheet>

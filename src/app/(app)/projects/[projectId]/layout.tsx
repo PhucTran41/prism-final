@@ -3,6 +3,7 @@ import { AppSidebar } from "@/src/frontend/components/layout/AppSideBar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/backend/modules/presentation/auth/handlers";
 import { headers } from "next/headers";
+import { FileTextIcon } from "lucide-react";
 
 export default async function ProjectLayout({
   children,
@@ -12,7 +13,7 @@ export default async function ProjectLayout({
   params: Promise<{ projectId: string }>;
 }) {
   const { projectId } = await params;
-  const items = [{ title: "Project Brief", href: `/projects/${projectId}/brief` }];
+  const items = [{ title: "Project Brief", href: `/projects/${projectId}/brief`, icon: <FileTextIcon /> }];
 
   const session = await getServerSession(authOptions);
   const user =
@@ -33,11 +34,11 @@ export default async function ProjectLayout({
   const projectName: string | undefined = projectData?.name ?? projectData?.project?.name ?? undefined;
 
   return (
-    <div className="flex">
+    <div className="flex h-full overflow-hidden">
       <div className="hidden md:block">
         <AppSidebar user={user} project={projectName ? { name: projectName } : undefined} items={items} />
       </div>
-      <main className="flex-1 min-h-screen">{children}</main>
+      <main className="flex-1 h-full overflow-y-auto">{children}</main>
     </div>
   );
 }

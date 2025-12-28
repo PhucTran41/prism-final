@@ -14,7 +14,7 @@ export function PrismLogo({
   wordmarkClassName,
 }: PrismLogoProps) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className ?? ""}`}>
+    <span className={`inline-flex items-center gap-2 ${className ?? "text-primary"}`}>
       <svg
         width={size}
         height={size}

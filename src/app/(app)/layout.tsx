@@ -9,10 +9,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect("/");
   }
   return (
-    <>
-      <Header />
-      {children}
-    </>
+    <div className="flex min-h-screen flex-col overflow-hidden">
+      <div className="fixed inset-x-0 top-0 z-50 bg-background">
+        <Header />
+      </div>
+      {/* Spacer to account for fixed header height (4rem) */}
+      <div className="h-16 shrink-0" />
+      <div className="flex-1 overflow-hidden">{children}</div>
+    </div>
   );
 }
 

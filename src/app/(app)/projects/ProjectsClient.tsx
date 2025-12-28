@@ -23,16 +23,8 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
 
   return (
     <>
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search for a project"
-            className="pl-8"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">Projects</h1>
         <div className="flex items-center gap-2">
           <Button variant={mode === "grid" ? "default" : "ghost"} size="icon" onClick={() => setMode("grid")} aria-label="Grid view">
             <LayoutGrid className="h-4 w-4" />
@@ -43,6 +35,17 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
           <Button asChild>
             <Link href="/projects/new">New project</Link>
           </Button>
+        </div>
+      </div>
+      <div className="mb-6">
+        <div className="relative w-full max-w-sm">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search for a project"
+            className="pl-8"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
         </div>
       </div>
       {projects.length === 0 ? (
