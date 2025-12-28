@@ -1,0 +1,32 @@
+name: projectBrief
+version: 1
+template: |
+  # Project Brief: {{name}}
+
+  {{#problem}}
+  ## Problem
+  {{problem}}
+  {{/problem}}
+
+  {{#targetUser}}
+  ## Target Users
+  {{targetUser}}
+  {{/targetUser}}
+
+  {{#goals}}
+  ## Goals
+  {{goals}}
+  {{/goals}}
+
+  {{#constraints}}
+  ## Constraints
+  {{constraints}}
+  {{/constraints}}
+
+  ## Scope (MVP)
+  - Outline the minimal viable set of features focusing on value and speed.
+
+  ## Success Metrics
+  - Define 3–5 measurable success indicators.
+
+

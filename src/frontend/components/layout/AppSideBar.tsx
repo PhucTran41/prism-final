@@ -18,6 +18,9 @@ interface SidebarProps {
     image?: string;
     role?: string;
   };
+  project?: {
+    name: string;
+  };
   items: {
     title: string;
     href?: string;
@@ -33,6 +36,7 @@ interface SidebarProps {
 
 export function AppSidebar({ 
   user, 
+  project,
   items, 
   onSignOut
 }: SidebarProps) {
@@ -173,7 +177,14 @@ export function AppSidebar({
                 </div>
               )}
             </div>
-            
+            {/* Project Summary */}
+            {!collapsed && (
+              <div className="px-4 py-3 border-b">
+                <p className="text-xs text-muted-foreground">Project</p>
+                <p className="text-sm font-medium truncate">{project?.name ?? "Untitled project"}</p>
+              </div>
+            )}
+
             {/* Navigation */}
             <ScrollArea className="flex-1">
               <div className={cn("py-2", collapsed ? "px-2" : "px-3")}>
@@ -351,6 +362,11 @@ export function AppSidebar({
                   <p className="text-xs text-muted-foreground">{user?.email || "user@example.com"}</p>
                 </div>
               </div>
+            {/* Project Summary (mobile) */}
+            <div className="px-4 py-3 border-b">
+              <p className="text-xs text-muted-foreground">Project</p>
+              <p className="text-sm font-medium truncate">{project?.name ?? "Untitled project"}</p>
+            </div>
               
               {/* Navigation */}
               <ScrollArea className="flex-1">

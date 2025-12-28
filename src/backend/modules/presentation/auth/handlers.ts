@@ -1,9 +1,9 @@
-import NextAuth from 'next-auth';
+import NextAuth, { type NextAuthOptions } from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { AppConfig } from '@/src/config/AppConfig';
 import { prismaClient } from '@/src/backend/shared/infrastructure/prisma';
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     Google({
       clientId: AppConfig.google.clientId,
@@ -29,7 +29,9 @@ const handler = NextAuth({
       return true;
     },
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
 

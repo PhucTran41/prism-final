@@ -49,11 +49,8 @@ export function Header() {
 
   // Navigation items based on user role
   const navItems = [
-    { href: "/pricing", label: "Pricing" },
-    { href: "/about", label: "About" },
-    { href: "/blog", label: "Blog" },
-    { href: "/docs", label: "Documentation" },
-    { href: "/contact", label: "Contact" },
+    { href: "", label: "" },
+
   ];
 
   return (
@@ -70,7 +67,7 @@ export function Header() {
               <NavigationMenuList>
                 {navItems.map((item) => (
                   <NavigationMenuItem key={item.href}>
-                    <Link href={item.href} legacyBehavior passHref>
+                    <Link href={item.href} passHref>
                       <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                         {item.label}
                       </NavigationMenuLink>
@@ -86,9 +83,9 @@ export function Header() {
           <ThemeToggle />
           
           {/* Get Started Button - Always visible */}
-          <Button variant="ghost" asChild className="hidden md:block mr-2">
+          {/* <Button variant="ghost" asChild className="hidden md:block mr-2">
             <Link href="/contact">Get Started</Link>
-          </Button>
+          </Button> */}
           
           {/* Mobile Menu Button */}
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
