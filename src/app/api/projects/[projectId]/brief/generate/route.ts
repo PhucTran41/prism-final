@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/src/backend/modules/presentation/auth/handlers';
-import { generateProjectBriefHandler } from '@/src/backend/modules/presentation/document/handlers';
-import { getOwnedProjectByEmail } from '@/src/backend/modules/presentation/project/handlers';
+import { authOptions } from '@/backend/modules/presentation/auth/handlers';
+import { generateProjectBriefHandler } from '@/backend/modules/presentation/document/handlers';
+import { getOwnedProjectByEmail } from '@/backend/modules/presentation/project/handlers';
 import { generateBriefSchema } from './schemas';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {

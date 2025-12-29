@@ -1,4 +1,4 @@
-import { prismaClient } from '@/src/backend/shared/infrastructure/prisma';
+import { prismaClient } from '@/backend/shared/infrastructure/prisma';
 
 export class DocumentPrismaRepo {
   async getByType(projectId: number, type: string) {

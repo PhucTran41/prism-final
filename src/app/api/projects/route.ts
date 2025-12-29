@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/src/backend/modules/presentation/auth/handlers';
-import { createProjectHandler, listProjectsHandler, getUserIdByEmail } from '@/src/backend/modules/presentation/project/handlers';
+import { authOptions } from '@/backend/modules/presentation/auth/handlers';
+import { createProjectHandler, listProjectsHandler, getUserIdByEmail } from '@/backend/modules/presentation/project/handlers';
 import { createProjectSchema } from './schemas';
 
 export async function GET() {

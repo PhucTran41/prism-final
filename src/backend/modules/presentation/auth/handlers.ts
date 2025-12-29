@@ -1,7 +1,7 @@
 import NextAuth, { type NextAuthOptions } from 'next-auth';
 import Google from 'next-auth/providers/google';
-import { AppConfig } from '@/src/config/AppConfig';
-import { prismaClient } from '@/src/backend/shared/infrastructure/prisma';
+import { AppConfig } from '@/config/AppConfig';
+import { prismaClient } from '@/backend/shared/infrastructure/prisma';
 
 export const authOptions: NextAuthOptions = {
   providers: [

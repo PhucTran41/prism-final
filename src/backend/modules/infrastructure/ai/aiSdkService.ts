@@ -1,4 +1,4 @@
-import { AppConfig } from '@/src/config/AppConfig';
+import { AppConfig } from '@/config/AppConfig';
 import { generateText } from 'ai';
 import { getLanguageModel } from './providers';
 

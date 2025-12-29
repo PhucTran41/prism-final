@@ -1,5 +1,5 @@
-import { ProjectPrismaRepo } from '@/src/backend/modules/infrastructure/project/prisma/repo';
-import { prismaClient } from '@/src/backend/shared/infrastructure/prisma';
+import { ProjectPrismaRepo } from '@/backend/modules/infrastructure/project/prisma/repo';
+import { prismaClient } from '@/backend/shared/infrastructure/prisma';
 
 const projectRepo = new ProjectPrismaRepo();
 
