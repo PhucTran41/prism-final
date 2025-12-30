@@ -1,0 +1,11 @@
+name: rubric-epics
+version: 1
+template: |
+  Checklist:
+  - 4–8 epics max, each with a clear user value.
+  - Titles are specific; descriptions 1–2 sentences.
+  - Prioritize with M/S/C or P1..P3.
+  - Avoid overlap; epics are independent.
+  - JSON only; matches schema strictly.
+
+

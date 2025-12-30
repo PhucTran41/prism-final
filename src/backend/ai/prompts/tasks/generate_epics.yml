@@ -1,0 +1,20 @@
+name: task-generate-epics
+version: 1
+template: |
+  {{ system }}
+  Task: Generate a list of EPICS for "{{ name }}".
+  Context (Brief): {{ brief }}
+  Context (Scope): {{ scope }}
+  Strictness: {{ strictness }}
+
+  Apply rubric:
+  {{ rubric }}
+
+  Output JSON ONLY (no prose). Schema:
+  {
+    "epics": [
+      { "title": "string", "description": "string", "priority": "M|S|C|P1|P2|P3", "status": "PLANNED" }
+    ]
+  }
+
+

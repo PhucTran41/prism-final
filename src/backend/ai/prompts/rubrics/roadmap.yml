@@ -1,0 +1,11 @@
+name: rubric-roadmap
+version: 1
+template: |
+  Checklist:
+  - 4–8 items grouped by target (e.g., Q1 2026).
+  - Each item 1-line title + 1-line description.
+  - Targets are realistic (quarters or months).
+  - Prioritize P1..P3 or M/S/C.
+  - JSON only; matches schema strictly.
+
+

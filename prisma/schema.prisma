@@ -35,6 +35,9 @@ model Project {
   status      ProjectStatus   @default(DRAFT)
   documents   Document[]
   members     ProjectMember[]
+  epics       Epic[]
+  stories     Story[]
+  roadmapItems RoadmapItem[]
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   deletedAt   DateTime?
@@ -70,6 +73,59 @@ model Document {
   deletedAt     DateTime?
 
   @@unique([projectId, type])
+  @@index([projectId, updatedAt])
+}
+
+// Planning entities (structured)
+model Epic {
+  id          Int       @id @default(autoincrement())
+  projectId   Int
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  priority    String?   // e.g. M/S/C or P1..P3
+  status      String?   // e.g. PLANNED, IN_PROGRESS
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  stories     Story[]
+
+  @@index([projectId, updatedAt])
+}
+
+model Story {
+  id           Int       @id @default(autoincrement())
+  projectId    Int
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  epicId       Int?
+  epic         Epic?     @relation(fields: [epicId], references: [id], onDelete: SetNull)
+  title        String
+  description  String?
+  acceptance   String?   @db.Text
+  priority     String?
+  status       String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  @@index([projectId, updatedAt])
+  @@index([epicId])
+}
+
+model RoadmapItem {
+  id           Int       @id @default(autoincrement())
+  projectId    Int
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  target       String?   // e.g. Q1-2026 or Month
+  priority     String?
+  status       String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
   @@index([projectId, updatedAt])
 }
 

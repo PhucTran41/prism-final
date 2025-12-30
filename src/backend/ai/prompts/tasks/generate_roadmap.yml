@@ -1,0 +1,20 @@
+name: task-generate-roadmap
+version: 1
+template: |
+  {{ system }}
+  Task: Generate a simple MVP Roadmap for "{{ name }}".
+  Context (Brief): {{ brief }}
+  Context (Scope): {{ scope }}
+  Strictness: {{ strictness }}
+
+  Apply rubric:
+  {{ rubric }}
+
+  Output JSON ONLY (no prose). Schema:
+  {
+    "items": [
+      { "title": "string", "description": "string", "target": "Q1-2026|Month", "priority": "P1|P2|P3", "status": "PLANNED" }
+    ]
+  }
+
+

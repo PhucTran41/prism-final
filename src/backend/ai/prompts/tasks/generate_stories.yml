@@ -1,0 +1,28 @@
+name: task-generate-stories
+version: 1
+template: |
+  {{ system }}
+  Task: Generate USER STORIES for "{{ name }}".
+  Context (Brief): {{ brief }}
+  Context (Scope): {{ scope }}
+  Context (Epics): {{ epic_titles }}
+  Strictness: {{ strictness }}
+
+  Apply rubric:
+  {{ rubric }}
+
+  Output JSON ONLY (no prose). Schema:
+  {
+    "stories": [
+      {
+        "epic": "optional epic title",
+        "title": "As a … I want … so that …",
+        "description": "string",
+        "acceptance": ["bullet", "bullet"],
+        "priority": "M|S|C|P1|P2|P3",
+        "status": "PLANNED"
+      }
+    ]
+  }
+
+

@@ -1,0 +1,11 @@
+name: rubric-stories
+version: 1
+template: |
+  Checklist:
+  - 6–20 stories; each maps to an epic by title if provided.
+  - Use “As a … I want … so that …” format.
+  - Include brief acceptance criteria (2–5 bullets).
+  - Prioritize with M/S/C or P1..P3.
+  - JSON only; matches schema strictly.
+
+
