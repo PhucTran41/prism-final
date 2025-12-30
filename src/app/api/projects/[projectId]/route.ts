@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/src/backend/modules/presentation/auth/handlers';
-import { deleteProjectHandler, getOwnedProjectByEmail, getProjectHandler } from '@/src/backend/modules/presentation/project/handlers';
+import { authOptions } from '@/backend/modules/presentation/auth/handlers';
+import { deleteProjectHandler, getOwnedProjectByEmail, getProjectHandler } from '@/backend/modules/presentation/project/handlers';
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   const session = await getServerSession(authOptions);

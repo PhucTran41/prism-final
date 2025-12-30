@@ -1,5 +1,5 @@
-import { prismaClient } from '@/src/backend/shared/infrastructure/prisma';
-import { ProjectStatus, type ProjectEntity } from '@/src/backend/modules/domain/project/types';
+import { prismaClient } from '@/backend/shared/infrastructure/prisma';
+import { ProjectStatus, type ProjectEntity } from '@/backend/modules/domain/project/types';
 
 export class ProjectPrismaRepo {
   async listByOwner(ownerId: number): Promise<ProjectEntity[]> {

@@ -1,1 +1,1 @@
-export { GET, POST } from '@/src/backend/modules/presentation/auth/handlers';
+export { GET, POST } from '@/backend/modules/presentation/auth/handlers';

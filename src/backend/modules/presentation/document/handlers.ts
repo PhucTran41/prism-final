@@ -1,6 +1,6 @@
-import { DocumentPrismaRepo } from '@/src/backend/modules/infrastructure/document/prisma/repo';
-import { AiSdkService } from '@/src/backend/modules/infrastructure/ai/aiSdkService';
-import { buildPromptFromTemplate, loadTemplate } from '@/src/backend/ai';
+import { DocumentPrismaRepo } from '@/backend/modules/infrastructure/document/prisma/repo';
+import { AiSdkService } from '@/backend/modules/infrastructure/ai/aiSdkService';
+import { buildPromptFromTemplate, loadTemplate } from '@/backend/ai';
 
 const documentRepo = new DocumentPrismaRepo();
 const ai = new AiSdkService();
