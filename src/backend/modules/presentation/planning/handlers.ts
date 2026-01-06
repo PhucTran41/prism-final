@@ -11,7 +11,7 @@ const storyRepo = new StoryPrismaRepo();
 const roadmapRepo = new RoadmapPrismaRepo();
 const docRepo = new DocumentPrismaRepo();
 
-function parseJsonFromText(text: string): any {
+function parseJsonFromText(text: string): unknown {
   let src = (text ?? '').trim();
   // Prefer fenced JSON block if present
   const fenced = src.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -67,7 +67,7 @@ export async function listStories(projectId: number) {
 }
 
 export async function saveStories(projectId: number, items: StoryUpsertInput[]) {
-  const rows = await storyRepo.bulkUpsert(projectId, items);
+  const rows = await storyRepo.bulkUpsert(projectId, normalizeStoriesForSave(items as unknown[]));
   return { stories: rows };
 }
 
@@ -126,6 +126,54 @@ export async function generateRoadmap(projectId: number, payload: { name: string
   });
   const json = parseJsonFromText(resp.text);
   return json as { items: RoadmapUpsertInput[] };
+}
+
+function normalizeStoriesForSave(items: unknown[]): StoryUpsertInput[] {
+  const toStatus = (v: unknown): 'PLANNED'|'IN_PROGRESS'|'DONE'|null => {
+    const s = String(v ?? '').toUpperCase();
+    if (s === 'PLANNED' || s === 'IN_PROGRESS' || s === 'DONE') return s;
+    return null;
+  };
+  const toPriority = (v: unknown): 'M'|'S'|'C'|null => {
+    const s = String(v ?? '').toUpperCase();
+    if (s === 'M' || s === 'S' || s === 'C') return s;
+    return null;
+  };
+  return (items ?? []).map((raw) => {
+    const it = (raw ?? {}) as Record<string, unknown>;
+    const acceptanceRaw = it.acceptance;
+    const acceptance =
+      Array.isArray(acceptanceRaw)
+        ? (acceptanceRaw as unknown[])
+            .map((x) => String(x ?? '').trim())
+            .filter(Boolean)
+            .map((x) => `- ${x}`)
+            .join('\n')
+        : (typeof acceptanceRaw === 'string' ? acceptanceRaw : null);
+    const epicIdRaw = it.epicId;
+    const epicId =
+      typeof epicIdRaw === 'number'
+        ? epicIdRaw
+        : (typeof epicIdRaw === 'string' && /^\d+$/.test(epicIdRaw))
+          ? Number.parseInt(epicIdRaw, 10)
+          : null;
+    const idRaw = it.id;
+    const id =
+      typeof idRaw === 'number'
+        ? idRaw
+        : (typeof idRaw === 'string' && /^\d+$/.test(idRaw))
+          ? Number.parseInt(idRaw, 10)
+          : undefined;
+    return {
+      id,
+      epicId,
+      title: String(it.title ?? '').trim(),
+      description: typeof it.description === 'string' ? it.description : null,
+      acceptance,
+      priority: toPriority(it.priority),
+      status: toStatus(it.status),
+    };
+  });
 }
 
 

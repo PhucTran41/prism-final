@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/backend/modules/presentation/auth/handlers";
 import { headers } from "next/headers";
 import { Separator } from "@/src/frontend/components/ui/separator";
-import { Card, CardContent } from "@/src/frontend/components/ui/card";
 import EpicsPageClient from "./EpicsPageClient";
 
 export default async function EpicsPage({ params }: { params: Promise<{ projectId: string }> }) {
@@ -24,10 +23,18 @@ export default async function EpicsPage({ params }: { params: Promise<{ projectI
   const data = await res.json().catch(() => ({}));
   const epics = Array.isArray(data?.epics) ? data.epics : [];
 
+  // also fetch stories for inline viewing within epics
+  const resStories = await fetch(`${process.env.NEXTAUTH_URL ?? ""}/api/projects/${projectId}/stories`, {
+    cache: "no-store",
+    headers: { cookie: cookieHeader },
+  }).catch(() => undefined);
+  const storiesData = resStories ? await resStories.json().catch(() => ({})) : {};
+  const stories = Array.isArray(storiesData?.stories) ? storiesData.stories : [];
+
   return (
     <div className="container mx-auto max-w-5xl px-4 py-8">
       <div className="mb-6 space-y-2">
-        <EpicsPageClient projectId={projectId} projectName={projectName} initial={epics} />
+        <EpicsPageClient projectId={projectId} projectName={projectName} initial={epics} initialStories={stories} />
         <p className="text-sm text-muted-foreground">Structured epics you can edit and save.</p>
         <Separator />
       </div>

@@ -16,7 +16,9 @@ import {
 } from "@/src/frontend/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/src/frontend/components/ui/select";
 
-export function GenerateEpicsForm({ projectId, projectName, onGenerated, disabled }: { projectId: string; projectName?: string; onGenerated?: (epics: any[]) => void; disabled?: boolean }) {
+type Epic = { id?: number; title: string; description?: string | null; priority?: string | null; status?: string | null };
+
+export function GenerateEpicsForm({ projectId, projectName, onGenerated, disabled }: { projectId: string; projectName?: string; onGenerated?: (epics: Epic[]) => void; disabled?: boolean }) {
   const [template, setTemplate] = useState<string>("none");
   const [strictness, setStrictness] = useState<"normal"|"strict">("normal");
   const [loading, setLoading] = useState(false);
@@ -43,17 +45,26 @@ export function GenerateEpicsForm({ projectId, projectName, onGenerated, disable
         throw new Error(j?.error || "Failed to generate");
       }
       const data = await res.json();
-      if (onGenerated && Array.isArray(data?.epics)) {
-        onGenerated(data.epics);
-        toast.success("Draft generated. Review and click Save.", { id: toastId });
-      } else {
-        toast.success("Epics generated", { id: toastId });
-        // fallback: reload if no handler provided
-        location.reload();
+      const generated: Epic[] = Array.isArray(data?.epics) ? data.epics : [];
+      // auto-save immediately
+      const saveRes = await fetch(`/api/projects/${projectId}/epics`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ epics: generated }),
+      });
+      if (!saveRes.ok) {
+        const j = await saveRes.json().catch(() => ({}));
+        throw new Error(j?.error || "Failed to save generated epics");
       }
+      const saved = await saveRes.json();
+      if (onGenerated && Array.isArray(saved?.epics)) {
+        onGenerated(saved.epics as Epic[]);
+      }
+      toast.success("Epics generated and saved.", { id: toastId });
       setOpen(false);
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to generate", { id: toastId });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Failed to generate";
+      toast.error(message, { id: toastId });
       setLoading(false);
     }
   };
@@ -84,7 +95,7 @@ export function GenerateEpicsForm({ projectId, projectName, onGenerated, disable
           </div>
           <div className="flex items-center justify-between">
             <Label className="text-xs text-muted-foreground">Strictness</Label>
-            <Select value={strictness} onValueChange={(v)=>setStrictness(v as any)}>
+            <Select value={strictness} onValueChange={(v)=>setStrictness(v === 'strict' ? 'strict' : 'normal')}>
               <SelectTrigger className="h-8 w-[220px]">
                 <SelectValue />
               </SelectTrigger>
