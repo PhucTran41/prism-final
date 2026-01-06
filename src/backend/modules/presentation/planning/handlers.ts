@@ -147,8 +147,19 @@ export async function generateRoadmap(projectId: number, payload: {
   const rubric = (await loadTemplate('rubrics/roadmap.yml')).template;
   const brief = await docRepo.getByType(projectId, 'PROJECT_BRIEF');
   const scope = await docRepo.getByType(projectId, 'PROJECT_SCOPE');
-  const epics = await epicRepo.list(projectId);
-  const stories = await storyRepo.list(projectId);
+  const epics = (await epicRepo.list(projectId)) as Array<{
+    id: number;
+    title: string;
+    priority?: string | null;
+    status?: string | null;
+  }>;
+  const stories = (await storyRepo.list(projectId)) as Array<{
+    id: number;
+    epicId: number | null;
+    title: string;
+    priority?: string | null;
+    status?: string | null;
+  }>;
   const prompt = await buildPromptFromTemplate('tasks/generate_roadmap.yml', {
     system,
     rubric,
