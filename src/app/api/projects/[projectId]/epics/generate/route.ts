@@ -13,9 +13,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
   const owned = await getOwnedProjectByEmail(session.user.email, id);
   if (!owned) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   const json = await req.json().catch(() => ({}));
-  const payload = {
+  const payload: { name: string; strictness?: 'normal'|'strict'; model?: string; temperature?: number; top_p?: number } = {
     name: json?.name ?? 'Project',
-    strictness: json?.strictness === 'strict' ? 'strict' : 'normal',
+    strictness: (json?.strictness === 'strict' ? 'strict' : 'normal') as 'normal' | 'strict',
     model: json?.model,
     temperature: json?.temperature,
     top_p: json?.top_p,

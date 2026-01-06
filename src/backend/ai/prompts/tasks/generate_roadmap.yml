@@ -1,20 +1,58 @@
 name: task-generate-roadmap
-version: 1
+version: 2
 template: |
   {{ system }}
-  Task: Generate a simple MVP Roadmap for "{{ name }}".
+
+  Task: Generate a complete, dated roadmap for "{{ name }}".
+
+  Inputs (constraints and environment):
+  - Strictness: {{ strictness }}
+  - Cadence: {{ cadence }}           # weekly | monthly | quarterly
+  - Horizon (months): {{ horizon_months }}
+  - Start date: {{ start_date }}     # YYYY-MM-DD
+  - Max items per period: {{ max_items_per_period }}
+  - Team size: {{ team_size }}
+  - Work days per week: {{ work_days_per_week }}
+  - Velocity (points per sprint): {{ velocity_points_per_sprint }}
+  - Avg story points: {{ avg_story_points }}
+  - Avg epic points: {{ avg_epic_points }}
+  - Include story-level schedule: {{ include_story_schedule }}   # yes|no
+  - Holidays (YYYY-MM-DD, comma separated): {{ holidays_csv }}
+  - Release milestones (comma separated): {{ release_milestones }}
+
   Context (Brief): {{ brief }}
   Context (Scope): {{ scope }}
-  Strictness: {{ strictness }}
+  Existing Epics (id,title,priority,status): {{ epics }}
+  Existing Stories (id,epicId,title,priority,status): {{ stories_meta }}
 
   Apply rubric:
   {{ rubric }}
 
-  Output JSON ONLY (no prose). Schema:
+  Output JSON ONLY (no prose). Strict schema:
   {
     "items": [
-      { "title": "string", "description": "string", "target": "Q1-2026|Month", "priority": "P1|P2|P3", "status": "PLANNED" }
+      {
+        "title": "string",
+        "description": "string",
+        "epicTitle": "string (optional)",
+        "startDate": "YYYY-MM-DD",
+        "endDate": "YYYY-MM-DD",
+        "priority": "M|S|C",
+        "status": "PLANNED|IN_PROGRESS|DONE"
+      }
+    ],
+    "epics": [
+      { "id": 123, "title": "string", "startDate": "YYYY-MM-DD", "endDate": "YYYY-MM-DD" }
+    ],
+    "stories": [
+      { "id": 456, "title": "string", "epicId": 123, "startDate": "YYYY-MM-DD", "endDate": "YYYY-MM-DD", "priority": "M|S|C" }
     ]
   }
 
+  Scheduling rules:
+  - Dates must be ISO (YYYY-MM-DD) and respect work days per week.
+  - Avoid holidays when possible by shifting to the next work day.
+  - Respect cadence and limit to "max items per period".
+  - Ensure stories fall within their parent epic window.
+  - If include story-level schedule is "no", omit the "stories" array entirely.
 

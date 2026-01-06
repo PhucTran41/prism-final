@@ -1,11 +1,13 @@
 name: rubric-roadmap
-version: 1
+version: 2
 template: |
   Checklist:
-  - 4–8 items grouped by target (e.g., Q1 2026).
-  - Each item 1-line title + 1-line description.
-  - Targets are realistic (quarters or months).
-  - Prioritize P1..P3 or M/S/C.
-  - JSON only; matches schema strictly.
-
-
+  - JSON only; schema matches exactly (items[], and optionally epics[]/stories[]).
+  - Dates use ISO format YYYY-MM-DD.
+  - Cadence respected (weekly/monthly/quarterly) and "max items per period" not exceeded.
+  - Horizon and start date respected; items fall within window.
+  - Holidays avoided by shifting to next work day.
+  - Story windows are within their parent epic windows.
+  - Priorities use M/S/C consistently.
+  - If include story-level schedule is "no", omit stories[] entirely.
+  - Items are concise: 1-line title + 1-line description.

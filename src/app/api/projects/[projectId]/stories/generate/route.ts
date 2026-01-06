@@ -13,10 +13,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
   const owned = await getOwnedProjectByEmail(session.user.email, id);
   if (!owned) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   const json = await req.json().catch(() => ({}));
-  const payload = {
+  const strictness: 'normal' | 'strict' = json?.strictness === 'strict' ? 'strict' : 'normal';
+  const epicTitles: string[] | undefined = Array.isArray(json?.epicTitles) ? (json.epicTitles as string[]) : undefined;
+  const payload: { name: string; epicTitles?: string[]; strictness?: 'normal'|'strict'; model?: string; temperature?: number; top_p?: number } = {
     name: json?.name ?? 'Project',
-    epicTitles: Array.isArray(json?.epicTitles) ? json.epicTitles : undefined,
-    strictness: json?.strictness === 'strict' ? 'strict' : 'normal',
+    epicTitles,
+    strictness,
     model: json?.model,
     temperature: json?.temperature,
     top_p: json?.top_p,

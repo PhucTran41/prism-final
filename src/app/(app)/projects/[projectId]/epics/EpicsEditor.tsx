@@ -175,7 +175,24 @@ export default function EpicsEditor({
   const generateStoriesForAll = async () => {
     const toastId = toast.loading("Generating stories for all epics…");
     try {
-      for (const e of items) {
+      // Ensure epics are saved so they all have stable ids
+      const saveRes = await fetch(`/api/projects/${projectId}/epics`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ epics: items }),
+      });
+      if (!saveRes.ok) {
+        const j = await saveRes.json().catch(() => ({}));
+        throw new Error(j?.error || "Failed to save epics before generation");
+      }
+      const saved = await saveRes.json().catch(() => ({}));
+      const savedEpics: Epic[] = Array.isArray(saved?.epics) ? saved.epics : items;
+      setItems(savedEpics);
+      savedEpicsSnapshot.current = JSON.stringify(normalizeEpics(savedEpics));
+
+      let generatedFor = 0;
+      const failures: string[] = [];
+      for (const e of savedEpics) {
         if (!e.title) continue;
         const res = await fetch(`/api/projects/${projectId}/stories/generate`, {
           method: "POST",
@@ -188,10 +205,32 @@ export default function EpicsEditor({
         }
         const data = await res.json();
         const genRaw: Story[] = Array.isArray(data?.stories) ? data.stories : [];
-        const gen: Story[] = genRaw.map((s) => ({ ...s, epicId: (e.id ?? null) }));
+        let out = genRaw;
+        // Retry once with stricter mode if none returned
+        if (out.length === 0) {
+          const retry = await fetch(`/api/projects/${projectId}/stories/generate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: "Project", epicTitles: [e.title], strictness: "strict" }),
+          });
+          if (retry.ok) {
+            const d2 = await retry.json().catch(() => ({}));
+            out = Array.isArray(d2?.stories) ? d2.stories : [];
+          }
+        }
+        if (out.length === 0) {
+          failures.push(e.title);
+          continue;
+        }
+        const gen: Story[] = out.map((s) => ({ ...s, epicId: (e.id ?? null) }));
         setStories((prev) => [...prev, ...gen]);
+        generatedFor += 1;
       }
-      toast.success("Stories generated.", { id: toastId });
+      if (failures.length > 0) {
+        toast.message(`Stories generated for ${generatedFor} epics. ${failures.length} returned none: ${failures.join(", ")}`, { id: toastId });
+      } else {
+        toast.success("Stories generated for all epics.", { id: toastId });
+      }
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Failed to generate stories";
       toast.error(message, { id: toastId });

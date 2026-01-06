@@ -5,6 +5,9 @@ export type RoadmapUpsertInput = {
   title: string;
   description?: string | null;
   target?: string | null;
+  startDate?: string | Date | null;
+  endDate?: string | Date | null;
+  epicId?: number | null;
   priority?: string | null;
   status?: string | null;
 };
@@ -27,6 +30,9 @@ export class RoadmapPrismaRepo {
             title: item.title,
             description: item.description ?? null,
             target: item.target ?? null,
+            startDate: item.startDate ? new Date(item.startDate) : null,
+            endDate: item.endDate ? new Date(item.endDate) : null,
+            epicId: typeof item.epicId === 'number' ? item.epicId : null,
             priority: item.priority ?? null,
             status: item.status ?? null,
           },
@@ -39,6 +45,9 @@ export class RoadmapPrismaRepo {
             title: item.title,
             description: item.description ?? null,
             target: item.target ?? null,
+            startDate: item.startDate ? new Date(item.startDate) : null,
+            endDate: item.endDate ? new Date(item.endDate) : null,
+            epicId: typeof item.epicId === 'number' ? item.epicId : null,
             priority: item.priority ?? null,
             status: item.status ?? null,
           },

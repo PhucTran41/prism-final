@@ -6,6 +6,8 @@ export type EpicUpsertInput = {
   description?: string | null;
   priority?: string | null;
   status?: string | null;
+  startDate?: string | Date | null;
+  endDate?: string | Date | null;
 };
 
 export class EpicPrismaRepo {
@@ -27,7 +29,9 @@ export class EpicPrismaRepo {
             description: item.description ?? null,
             priority: item.priority ?? null,
             status: item.status ?? null,
-          },
+            startDate: item.startDate ? new Date(item.startDate) : null,
+            endDate: item.endDate ? new Date(item.endDate) : null,
+          } as unknown as never,
         });
         results.push(updated);
       } else {
@@ -38,7 +42,9 @@ export class EpicPrismaRepo {
             description: item.description ?? null,
             priority: item.priority ?? null,
             status: item.status ?? null,
-          },
+            startDate: item.startDate ? new Date(item.startDate) : null,
+            endDate: item.endDate ? new Date(item.endDate) : null,
+          } as unknown as never,
         });
         results.push(created);
       }
