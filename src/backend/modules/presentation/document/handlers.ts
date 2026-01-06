@@ -112,4 +112,46 @@ export async function generateProjectScopeHandler(projectId: number, payload: {
   return { document: saved, content: result.text } as const;
 }
 
+export async function getAssumptionsRisksHandler(projectId: number) {
+  const doc = await documentRepo.getByType(projectId, 'ASSUMPTIONS_RISKS');
+  return { document: doc } as const;
+}
+
+export async function updateAssumptionsRisksHandler(projectId: number, contentMd: string) {
+  const existing = await documentRepo.getByType(projectId, 'ASSUMPTIONS_RISKS');
+  const title = existing?.title ?? "Assumptions & Risks";
+  const saved = await documentRepo.upsertByType(projectId, 'ASSUMPTIONS_RISKS', title, contentMd);
+  return { document: saved } as const;
+}
+
+export async function generateAssumptionsRisksHandler(projectId: number, payload: {
+  name: string;
+  context?: string;
+  knownRisks?: string;
+  model?: string;
+  temperature?: number;
+  top_p?: number;
+  strictness?: 'normal' | 'strict';
+}) {
+  const system = (await loadTemplate('system/default.yml')).template;
+  const rubric = (await loadTemplate('rubrics/assumptions.yml')).template;
+  const prompt = await buildPromptFromTemplate('tasks/generate_assumptions.yml', {
+    system,
+    rubric,
+    name: payload.name,
+    context: payload.context,
+    knownRisks: payload.knownRisks,
+    strictness: payload.strictness ?? 'normal',
+  });
+  const result = await ai.generateText({
+    model: payload.model ?? 'google/gemini-2.5-flash-lite',
+    prompt,
+    temperature: payload.temperature ?? 0.4,
+    topP: payload.top_p ?? 0.9,
+  });
+  const title = `${payload.name} — Assumptions & Risks`;
+  const saved = await documentRepo.upsertByType(projectId, 'ASSUMPTIONS_RISKS', title, result.text);
+  return { document: saved, content: result.text } as const;
+}
+
 

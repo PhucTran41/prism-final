@@ -1,0 +1,33 @@
+name: task-generate-assumptions
+version: 1
+template: |
+  {{ system }}
+
+  Task: Create an "Assumptions & Risks" document for "{{ name }}".
+  Strictness: {{ strictness }}
+
+  Inputs:
+  - Context (optional): {{ context }}
+  - Known risks (optional): {{ knownRisks }}
+
+  Apply this rubric:
+  {{ rubric }}
+
+  Output format (Markdown) — constraints:
+  - ≤ 900 words total
+  - Keep bullets concise (≤ 16 words)
+  - Mark inferred points with [assumed] if inputs are missing
+
+  Output:
+  # Assumptions & Risks — {{ name }}
+  ## Key Assumptions
+  - ...
+  - ...
+  ## Risks
+  - ...
+  - ...
+  ## Mitigations
+  - ...
+  - ...
+
+

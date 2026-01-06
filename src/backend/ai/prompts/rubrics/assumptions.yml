@@ -1,0 +1,11 @@
+name: rubric-assumptions
+version: 1
+template: |
+  Use this checklist:
+  - Assumptions are specific, testable, and prioritized by impact/uncertainty.
+  - Risks cover product, technical, delivery, legal/compliance, and market.
+  - Each risk is concrete; avoid vague/buzzword phrasing.
+  - Mitigations are actionable, not platitudes.
+  - Document is concise (≤ 900 words) and skimmable.
+
+
