@@ -13,17 +13,17 @@ export function SignInForm() {
   };
 
   return (
-    <div className="w-full max-w-sm rounded-2xl border border-neutral-200/70 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
+    <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-sm dark:border-neutral-800">
       <div className="mb-6 space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">Use your Google account to continue.</p>
+        <p className="text-sm text-muted-foreground">Use your Google account to continue.</p>
       </div>
       <div className="grid gap-4">
         <button
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isLoading}
-          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white transition hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100"
+          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isLoading ? (
             <>
@@ -61,7 +61,7 @@ export function SignInForm() {
           )}
         </button>
       </div>
-      <div className="mt-6 text-center text-xs text-neutral-500 dark:text-neutral-400">
+      <div className="mt-6 text-center text-xs text-muted-foreground">
         By signing in, you agree to our{" "}
         <span className="underline underline-offset-4">Terms of Service</span> and{" "}
         <span className="underline underline-offset-4">Privacy Policy</span>.
