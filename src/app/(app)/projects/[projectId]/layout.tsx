@@ -3,7 +3,7 @@ import { AppSidebar } from "@/src/frontend/components/layout/AppSideBar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/backend/modules/presentation/auth/handlers";
 import { headers } from "next/headers";
-import { Brain, FileTextIcon, ListTodo, Map, Settings, ShieldCheck, Users } from "lucide-react";
+import { Brain, FileTextIcon, ListTodo, Map, MessageCircle, Settings, ShieldCheck, Users } from "lucide-react";
 
 export default async function ProjectLayout({
   children,
@@ -14,6 +14,7 @@ export default async function ProjectLayout({
 }) {
   const { projectId } = await params;
   const items = [
+    { title: "Chat", href: `/projects/${projectId}/chat`, icon: <MessageCircle /> },
     { title: "Project Brief", href: `/projects/${projectId}/brief`, icon: <FileTextIcon /> },
     { title: "Scope & Features", href: `/projects/${projectId}/scope`, icon: <Brain /> },
     { title: "Epics & Stories", href: `/projects/${projectId}/epics`, icon: <ListTodo /> },

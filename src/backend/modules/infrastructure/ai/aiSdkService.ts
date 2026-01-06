@@ -1,5 +1,4 @@
-import { AppConfig } from '@/config/AppConfig';
-import { generateText } from 'ai';
+import { generateText, streamText } from 'ai';
 import { getLanguageModel } from './providers';
 
 export type AiChatMessage =
@@ -60,6 +59,26 @@ export class AiSdkService {
       prompt,
     });
     return { text, raw: response };
+  }
+
+  async streamGenerateText(params: AiGenerateParams & { onDelta: (delta: string) => void }): Promise<AiResponse> {
+    const modelId = params.model || this.fallbackModel;
+    if (!modelId) {
+      throw new Error('model is required');
+    }
+    const { textStream, response } = await streamText({
+      model: getLanguageModel(modelId),
+      prompt: params.prompt,
+      temperature: params.temperature,
+      topP: params.topP,
+    });
+    let acc = '';
+    for await (const delta of textStream) {
+      const piece = typeof delta === 'string' ? delta : String(delta);
+      acc += piece;
+      params.onDelta(piece);
+    }
+    return { text: acc, raw: response };
   }
 }
 

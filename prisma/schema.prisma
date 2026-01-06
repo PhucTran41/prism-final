@@ -21,6 +21,7 @@ model User {
   name      String?
   projects  Project[] @relation("UserProjects")
   members   ProjectMember[]
+  chatThreads ChatThread[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -38,6 +39,7 @@ model Project {
   epics       Epic[]
   stories     Story[]
   roadmapItems RoadmapItem[]
+  chatThreads ChatThread[]
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   deletedAt   DateTime?
@@ -139,6 +141,36 @@ model RoadmapItem {
 
   @@index([projectId, updatedAt])
   @@index([epicId])
+}
+
+// Chat
+model ChatThread {
+  id         Int        @id @default(autoincrement())
+  projectId  Int
+  project    Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId     Int
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String?
+  visibility String      @default("private") // private | unlisted | public
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  deletedAt  DateTime?
+  messages   ChatMessage[]
+
+  @@index([projectId, updatedAt])
+  @@index([userId])
+}
+
+model ChatMessage {
+  id        Int       @id @default(autoincrement())
+  threadId  Int
+  thread    ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  role      String    // 'user' | 'assistant'
+  content   String?   @db.Text
+  parts     Json?
+  createdAt DateTime  @default(now())
+
+  @@index([threadId, createdAt])
 }
 
 

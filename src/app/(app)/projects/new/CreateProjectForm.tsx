@@ -81,7 +81,7 @@ export function CreateProjectForm() {
       const project = await res.json();
       const projectId = (project as { id: number }).id;
       toast.success("Project created", { id: toastId });
-      router.replace(`/projects/${projectId}/brief`);
+      router.replace(`/projects/${projectId}/preview`);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Something went wrong";
       setError(message);
