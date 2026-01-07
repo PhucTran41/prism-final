@@ -186,6 +186,24 @@ export default function ProjectChat({ projectId }: { projectId: string }) {
   const [cards, setCards] = useState<Proposal[]>([]);
   const [expandedCardIdx, setExpandedCardIdx] = useState<number | null>(null);
   const [applyingIdx, setApplyingIdx] = useState<number | null>(null);
+  const [phaseMeta, setPhaseMeta] = useState<{ phase?: string|null; step?: number; answers?: Record<string, unknown>; suggestions?: Record<string, string[]> } | null>(null);
+  const currentField = useMemo(() => {
+    if (!phaseMeta?.phase || !phaseMeta.step) return null;
+    const map: Record<string, string[]> = {
+      brief: ['problem', 'targetUsers', 'goals', 'constraints', 'confirm'],
+      scope: ['must', 'should', 'could', 'non_goals', 'confirm'],
+      epics: ['themes', 'outcomes', 'priorities', 'confirm'],
+      stories: ['epicTitles', 'seeds', 'acceptance', 'confirm'],
+      roadmap: ['schedule', 'milestones', 'confirm'],
+      risks: ['prompts', 'list', 'confirm'],
+    };
+    const list = map[String(phaseMeta.phase)] || [];
+    return list[(phaseMeta.step ?? 1) - 1] ?? null;
+  }, [phaseMeta?.phase, phaseMeta?.step]);
+  const currentSuggestions = useMemo(() => {
+    if (!phaseMeta?.suggestions || !currentField) return [];
+    return Array.isArray(phaseMeta.suggestions[currentField]) ? phaseMeta.suggestions[currentField] : [];
+  }, [phaseMeta?.suggestions, currentField]);
 
   const onApply = async (idx: number) => {
     const proposal = cards[idx];
@@ -250,6 +268,22 @@ export default function ProjectChat({ projectId }: { projectId: string }) {
     })();
   }, [projectId, threadId]);
 
+  // Poll active thread meta (phase/step)
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      if (!threadId) { setPhaseMeta(null); return; }
+      try {
+        const r = await fetch(`/api/projects/${projectId}/chat/threads/${threadId}`, { cache: "no-store" });
+        if (r.ok) {
+          const j = await r.json();
+          if (alive) setPhaseMeta(j?.thread?.meta ?? null);
+        }
+      } catch {}
+    })();
+    return () => { alive = false; };
+  }, [projectId, threadId, messages.length]);
+
   const openThread = async (tid: number) => {
     try {
       const r = await fetch(`/api/projects/${projectId}/chat/threads/${tid}`, { cache: "no-store" });
@@ -275,9 +309,14 @@ export default function ProjectChat({ projectId }: { projectId: string }) {
     <div className="flex w-full overflow-hidden">
       <div className="mx-auto w-full max-w-6xl flex h-[calc(100dvh-200px)] flex-col gap-3 overflow-hidden">
         <div className="sticky top-0 z-10 flex items-center justify-between rounded-md border bg-card/60 px-3 py-2 backdrop-blur supports-backdrop-filter:bg-card/60">
-          <div>
+          <div className="flex items-center gap-2">
             <div className="text-base font-semibold leading-none tracking-tight">{currentThreadTitle}</div>
-            <div className="text-xs text-muted-foreground">Type “/” for quick commands</div>
+            {phaseMeta?.phase ? (
+              <span className="ml-2 rounded-full border px-2 py-0.5 text-[11px] text-muted-foreground">
+                Phase: {String(phaseMeta.phase)} · Step {phaseMeta?.step ?? 1}
+              </span>
+            ) : null}
+            <div className="text-xs text-muted-foreground ml-2">Type “/” for quick commands</div>
           </div>
           <div className="flex items-center gap-2">
             <ThreadHistoryDropdown
@@ -336,6 +375,22 @@ export default function ProjectChat({ projectId }: { projectId: string }) {
           </div>
         </div>
         <div className="shrink-0 bg-card/60 backdrop-blur supports-backdrop-filter:bg-card/60">
+          {phaseMeta?.phase ? (
+            <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span className="rounded-full border px-2 py-0.5">Phase: {String(phaseMeta.phase)}</span>
+              <span className="rounded-full border px-2 py-0.5">Step {phaseMeta?.step ?? 1}</span>
+              <Button size="sm" variant="secondary" onClick={() => setInput("/back")}>/back</Button>
+              <Button size="sm" variant="secondary" onClick={() => setInput("/next")}>/next</Button>
+              <Button size="sm" onClick={() => setInput("/confirm")}>/confirm</Button>
+              <Button size="sm" variant="destructive" onClick={() => setInput("/restart")}>/restart</Button>
+              <Button size="sm" variant="secondary" onClick={() => setInput("/help")}>/help</Button>
+              <Button size="sm" variant="secondary" onClick={() => setInput("/suggest")}>/suggest</Button>
+              <Button size="sm" variant="secondary" onClick={() => setInput("/review")}>/review</Button>
+              <Button size="sm" variant="secondary" onClick={() => setInput("/skip")}>/skip</Button>
+              <Button size="sm" variant="secondary" onClick={() => setInput("/undo")}>/undo</Button>
+              <Button size="sm" variant="secondary" onClick={() => setInput("/auto")}>/auto</Button>
+            </div>
+          ) : null}
           {/* Quick actions */}
           <div className="mb-2 flex flex-wrap gap-2">
             {["/guide", "/brainstorm", "/brief", "/scope", "/epics", "/stories", "/roadmap", "/risks"].map(cmd => (
@@ -344,6 +399,34 @@ export default function ProjectChat({ projectId }: { projectId: string }) {
               </Button>
             ))}
           </div>
+          {phaseMeta?.answers ? (
+            <div className="mt-2 rounded-md border bg-background/60 p-2">
+              <div className="mb-1 text-xs text-muted-foreground">Answers so far</div>
+              <pre className="max-h-32 overflow-auto text-xs">{JSON.stringify(phaseMeta.answers, null, 2)}</pre>
+            </div>
+          ) : null}
+          {phaseMeta?.phase && currentSuggestions.length > 0 ? (
+            <div className="mt-2 rounded-md border bg-background/60 p-2">
+              <div className="mb-2 text-xs text-muted-foreground">Suggestions for {String(currentField)}</div>
+              <div className="flex flex-wrap gap-2">
+                {currentSuggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    className="rounded-full border px-2 py-0.5 text-xs hover:bg-muted"
+                    onClick={() => {
+                      setInput(`/pick ${i + 1}`);
+                      void send();
+                    }}
+                    title={s}
+                  >
+                    {i + 1}. {s.length > 48 ? s.slice(0, 48) + "…" : s}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 text-[11px] text-muted-foreground">Click to pick or type “/pick N”.</div>
+            </div>
+          ) : null}
           <div className="flex items-end gap-2">
             <Textarea
               value={input}
@@ -478,6 +561,18 @@ function extractTextFromMaybeJsonBlock(s: string): string {
     }
   } catch {
     // fall through
+  }
+  // If unfenced JSON was appended (common LLM quirk), try to parse a trailing JSON object.
+  try {
+    const tail = s.match(/\{[\s\S]*\}\s*$/);
+    if (tail && tail[0]) {
+      const obj = JSON.parse(tail[0]) as { text?: unknown };
+      if (typeof obj.text === "string" && obj.text.length > 0) {
+        return obj.text;
+      }
+    }
+  } catch {
+    // ignore
   }
   return s;
 }

@@ -3,12 +3,14 @@ import { buildPromptFromTemplate, loadTemplate } from '@/src/backend/ai';
 import { updateProjectBriefHandler, generateProjectBriefHandler, generateProjectScopeHandler } from '@/src/backend/modules/presentation/document/handlers';
 import { generateEpics, saveEpics, generateStories, saveStories, generateRoadmap, saveRoadmap } from '@/src/backend/modules/presentation/planning/handlers';
 import { DocumentPrismaRepo } from '@/src/backend/modules/infrastructure/document/prisma/repo';
+import { ProjectPrismaRepo } from '@/src/backend/modules/infrastructure/project/prisma/repo';
 import { EpicPrismaRepo } from '@/src/backend/modules/infrastructure/planning/prisma/epicRepo';
 import { StoryPrismaRepo } from '@/src/backend/modules/infrastructure/planning/prisma/storyRepo';
 import { RoadmapPrismaRepo } from '@/src/backend/modules/infrastructure/planning/prisma/roadmapRepo';
 
 const ai = new AiSdkService();
 const docRepo = new DocumentPrismaRepo();
+const projectRepo = new ProjectPrismaRepo();
 const epicRepo = new EpicPrismaRepo();
 const storyRepo = new StoryPrismaRepo();
 const roadmapRepo = new RoadmapPrismaRepo();
@@ -34,6 +36,7 @@ export async function chatOrchestrate(projectId: number, messages: ChatMessage[]
     system,
     rubric,
     conversation: messages.map(m => `${m.role}: ${m.content}`).join('\n'),
+    user_latest: messages[messages.length - 1]?.content ?? '',
     project_context: JSON.stringify(ctx),
   });
   if (onDelta) {
@@ -57,6 +60,7 @@ export async function chatOrchestrate(projectId: number, messages: ChatMessage[]
 }
 
 async function buildProjectContext(projectId: number) {
+  const project = await projectRepo.getById(projectId);
   const brief = await docRepo.getByType(projectId, 'PROJECT_BRIEF');
   const scope = await docRepo.getByType(projectId, 'PROJECT_SCOPE');
   const epics = (await epicRepo.list(projectId)) as Array<{
@@ -70,6 +74,14 @@ async function buildProjectContext(projectId: number) {
   }>;
   const truncate = (s?: string|null, n = 2000) => (s ? (s.length > n ? s.slice(0, n) + '\n…' : s) : '');
   return {
+    project: {
+      id: project?.id ?? projectId,
+      name: project?.name ?? 'Project',
+      description: truncate(project?.description ?? null, 2000),
+      status: (project as unknown as { status?: string })?.status ?? null,
+      createdAt: (project as unknown as { createdAt?: Date })?.createdAt ? new Date((project as unknown as { createdAt?: Date })?.createdAt as Date).toISOString() : null,
+      updatedAt: (project as unknown as { updatedAt?: Date })?.updatedAt ? new Date((project as unknown as { updatedAt?: Date })?.updatedAt as Date).toISOString() : null,
+    },
     brief: truncate(brief?.contentMd ?? null, 3000),
     scope: truncate(scope?.contentMd ?? null, 3000),
     epics: (epics ?? []).map(e => ({
@@ -112,13 +124,13 @@ export async function chatApply(projectId: number, proposal: ChatProposal) {
       return await generateEpics(projectId, { name: proposal.payload.name, strictness: proposal.payload.strictness ?? 'normal' });
     }
     case 'epics.save': {
-      return await saveEpics(projectId, proposal.payload.items as any);
+      return await saveEpics(projectId, proposal.payload.items as unknown as never);
     }
     case 'stories.generate': {
       return await generateStories(projectId, { name: proposal.payload.name, epicTitles: proposal.payload.epicTitles, strictness: proposal.payload.strictness ?? 'normal' });
     }
     case 'stories.save': {
-      return await saveStories(projectId, proposal.payload.items as any);
+      return await saveStories(projectId, proposal.payload.items as unknown as never);
     }
     case 'roadmap.generate': {
       return await generateRoadmap(projectId, {
@@ -135,7 +147,7 @@ export async function chatApply(projectId: number, proposal: ChatProposal) {
       });
     }
     case 'roadmap.save': {
-      return await saveRoadmap(projectId, proposal.payload.items as any);
+      return await saveRoadmap(projectId, proposal.payload.items as unknown as never);
     }
     default:
       return { error: 'Unsupported proposal' };

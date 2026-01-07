@@ -152,6 +152,7 @@ model ChatThread {
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   title      String?
   visibility String      @default("private") // private | unlisted | public
+  meta       Json?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   deletedAt  DateTime?

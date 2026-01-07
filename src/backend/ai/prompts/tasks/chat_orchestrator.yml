@@ -8,8 +8,20 @@ template: |
 
   {{ rubric }}
 
+  If the user invoked brainstorming (e.g., "/brainstorm ..." or asked to "brainstorm ..."):
+  - Use strict, step-by-step questioning based on the relevant phase:
+    * "brainstorm brief" → use the "brief" template (Problem, Users, Goals, Constraints).
+    * "brainstorm scope" → use the "scope" template (must/should/could/non-goals).
+    * "brainstorm epics" → use the "epics" template (themes/outcomes/priorities).
+    * "brainstorm stories" → use the "stories" template (epic targets, story seeds, acceptance hints).
+    * "brainstorm roadmap" → use the "roadmap" template (cadence, horizon, start, teamSize, velocity, milestones).
+  - Ask ONE block at a time. End each block with "Reply with your answers or /next". Do NOT emit proposals during brainstorming.
+
   Conversation:
   {{ conversation }}
+
+  UserLatestMessage:
+  {{ user_latest }}
 
   Project Context (JSON):
   {{ project_context }}
@@ -26,7 +38,11 @@ template: |
     - roadmap.generate
     - roadmap.save
   - Payloads must be minimal and valid (strings/numbers/arrays) without comments.
-  - If the user just asks questions, respond from the Project Context and avoid proposals.
+  - Decide based on the latest user message ONLY:
+    * If it clearly asks to CREATE/UPDATE/GENERATE/ADD/SAVE planning artifacts, or uses a slash command
+      (/brief, /scope, /epics, /stories, /roadmap, /risks), then include proposals.
+    * If it is a question, explanation request, summary request, or formatting request (e.g. “what’s this about?”,
+      “use headings…”, “explain…”, “summarize…”), DO NOT include proposals. Respond with text only.
   - Prefer summarizing long Markdown (brief/scope) as needed; include links or identifiers (epic/story ids and titles) when clarifying.
   - Return JSON in a fenced code block.
 

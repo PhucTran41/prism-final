@@ -43,8 +43,17 @@ export class ChatPrismaRepo {
         threadId,
         role,
         content: content ?? null,
-        parts: parts as any,
+        parts: parts as unknown as never,
       },
+    });
+  }
+
+  async updateMeta(threadId: number, meta: unknown) {
+    const patch = { meta } as unknown as never;
+    return prismaClient.chatThread.update({
+      where: { id: threadId },
+      data: patch,
+      select: { id: true },
     });
   }
 }

@@ -19,7 +19,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ projec
   if (!thread || thread.projectId !== pid) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   const rows = await repo.listMessages(tid);
   const messages = rows.map(r => ({ role: r.role as 'user'|'assistant', content: r.content ?? '' }));
-  return NextResponse.json({ messages });
+  return NextResponse.json({ thread: { id: thread.id, meta: (thread as any).meta ?? null }, messages });
 }
 
 
