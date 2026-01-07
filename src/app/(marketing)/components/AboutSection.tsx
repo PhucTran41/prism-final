@@ -65,29 +65,14 @@ export default function AboutSection() {
           >
             <motion.div
               className="absolute -left-4 -top-4 w-64 h-64 bg-primary/10 rounded-full filter blur-3xl"
-              animate={{
-                opacity: [0.5, 0.7, 0.5],
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Number.POSITIVE_INFINITY,
-                repeatType: "reverse",
-              }}
-            ></motion.div>
+              animate={{ opacity: [0.5, 0.7, 0.5], scale: [1, 1.1, 1] }}
+              transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }}
+            />
             <motion.div
               className="absolute -right-4 -bottom-4 w-64 h-64 bg-primary/10 rounded-full filter blur-3xl"
-              animate={{
-                opacity: [0.7, 0.5, 0.7],
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Number.POSITIVE_INFINITY,
-                repeatType: "reverse",
-                delay: 1,
-              }}
-            ></motion.div>
+              animate={{ opacity: [0.7, 0.5, 0.7], scale: [1, 1.1, 1] }}
+              transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse", delay: 1 }}
+            />
 
             <div className="relative z-10 grid grid-cols-2 gap-4">
               <div className="space-y-4">
@@ -107,6 +92,7 @@ export default function AboutSection() {
                     </motion.svg>
                   </div>
                 </motion.div>
+
                 <motion.div
                   className="bg-card/50 backdrop-blur-sm border border-border rounded-lg overflow-hidden h-56"
                   whileHover={{ y: -5 }}
@@ -114,25 +100,14 @@ export default function AboutSection() {
                 >
                   <div className="h-full w-full bg-gradient-to-tr from-transparent to-primary/20 p-6 flex flex-col justify-end">
                     <div className="space-y-2">
-                      <motion.div
-                        className="h-1 w-12 bg-primary"
-                        animate={{ width: ["0%", "12%"] }}
-                        transition={{ duration: 1, delay: 0.5 }}
-                      ></motion.div>
-                      <motion.div
-                        className="h-1 w-8 bg-primary/60"
-                        animate={{ width: ["0%", "8%"] }}
-                        transition={{ duration: 1, delay: 0.7 }}
-                      ></motion.div>
-                      <motion.div
-                        className="h-1 w-4 bg-primary/40"
-                        animate={{ width: ["0%", "4%"] }}
-                        transition={{ duration: 1, delay: 0.9 }}
-                      ></motion.div>
+                      <motion.div className="h-1 w-12 bg-primary" animate={{ width: ["0%", "12%"] }} transition={{ duration: 1, delay: 0.5 }} />
+                      <motion.div className="h-1 w-8 bg-primary/60" animate={{ width: ["0%", "8%"] }} transition={{ duration: 1, delay: 0.7 }} />
+                      <motion.div className="h-1 w-4 bg-primary/40" animate={{ width: ["0%", "4%"] }} transition={{ duration: 1, delay: 0.9 }} />
                     </div>
                   </div>
                 </motion.div>
               </div>
+
               <div className="space-y-4">
                 <motion.div
                   className="bg-card/50 backdrop-blur-sm border border-border rounded-lg overflow-hidden h-56"
@@ -145,10 +120,11 @@ export default function AboutSection() {
                       animate={{ rotate: 360 }}
                       transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                     >
-                      <div className="w-12 h-12 border-2 border-primary rounded-full"></div>
+                      <div className="w-12 h-12 border-2 border-primary rounded-full" />
                     </motion.div>
                   </div>
                 </motion.div>
+
                 <motion.div
                   className="bg-card/50 backdrop-blur-sm border border-border rounded-lg overflow-hidden h-40"
                   whileHover={{ y: -5 }}
@@ -159,7 +135,7 @@ export default function AboutSection() {
                       className="w-full h-1 bg-primary"
                       animate={{ width: ["0%", "100%"] }}
                       transition={{ duration: 1.5, delay: 1 }}
-                    ></motion.div>
+                    />
                   </div>
                 </motion.div>
               </div>
@@ -178,14 +154,14 @@ export default function AboutSection() {
             </motion.h2>
 
             <motion.p variants={itemVariants} className="text-muted-foreground">
-              Built on Next.js, Prisma, and the Vercel AI SDK, Prism generates consistent documents with YAML-driven prompts and Zod‑validated APIs, so your team can align fast and iterate safely.
+              Built on Next.js, Prisma, and the Vercel AI SDK, Prism generates consistent documents with YAML-driven prompts and Zod-validated APIs, so your team can align fast and iterate safely.
             </motion.p>
 
             <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 "Jira-like epics with nested stories and instant auto-save",
-                "Roadmap Gantt with milestones and story/epic date consistency",
-                "AI prompts structured with system/tasks/rubrics/templates (YAML)",
+                "Roadmap Gantt with milestones and story and epic date consistency",
+                "AI prompts structured with system, tasks, rubrics, and templates (YAML)",
                 "Zod schemas and auth guards on every API",
               ].map((feature) => (
                 <motion.div key={feature} variants={itemVariants} className="flex items-center space-x-2">
@@ -197,7 +173,9 @@ export default function AboutSection() {
 
             <motion.div variants={itemVariants}>
               <Link href="/signin">
-                <Button className="bg-primary hover:bg-primary/90 text-white">Learn more</Button>
+                <Button className="bg-primary hover:bg-primary/90 text-white">
+                  Learn more
+                </Button>
               </Link>
             </motion.div>
           </motion.div>
