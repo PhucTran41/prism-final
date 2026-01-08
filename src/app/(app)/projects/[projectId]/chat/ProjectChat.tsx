@@ -234,7 +234,15 @@ export default function ProjectChat({ projectId }: { projectId: string }) {
         }
         return String(proposal?.kind ?? "change applied");
       })();
-      setMessages(m => [...m, { role: "assistant", content: `✔ Applied: ${summary}` }]);
+      const maybeLink =
+        proposal?.kind?.startsWith("brief.")
+          ? `\n\nOpen: /projects/${projectId}/brief`
+          : proposal?.kind?.startsWith("scope.")
+          ? `\n\nOpen: /projects/${projectId}/scope`
+          : proposal?.kind?.startsWith("risks.")
+          ? `\n\nOpen: /projects/${projectId}/assumptions`
+          : "";
+      setMessages(m => [...m, { role: "assistant", content: `✔ Applied: ${summary}${maybeLink}` }]);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Apply failed";
       toast.error(msg, { id: toastId });
