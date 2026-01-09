@@ -57,14 +57,14 @@ export default function ContactSection() {
           <div>
             <div className="inline-block mb-6">
               <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-4 py-1 text-sm">
-                <span className="text-primary font-medium">Get in touch</span>
+                <span className="text-primary font-medium">Let’s Connect</span>
               </div>
             </div>
 
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Let’s plan your next release with Prism</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Kickstart your next release with Prism</h2>
 
             <p className="text-muted-foreground mb-8 max-w-lg">
-              Questions, demos, or enterprise needs? We’d love to help you get started.
+              Have questions or want a demo? We’re here to help.
             </p>
 
             <div className="space-y-6">
@@ -92,8 +92,7 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-1">Address</h3>
-                  <p className="text-muted-foreground">88 Silicon Ave, Suite 12, San Francisco, CA</p>
-                  <p className="text-muted-foreground">Mon–Fri, 9am–6pm PT</p>
+                  <p className="text-muted-foreground">88 Silicon Ave, Suite 12, San Francisco, CA | Mon–Fri, 9am–6pm PT</p>
                 </div>
               </div>
             </div>
@@ -102,15 +101,15 @@ export default function ContactSection() {
           <div className="relative">
             <div className="absolute -inset-4 bg-primary/10 rounded-xl filter blur-xl opacity-50"></div>
             <div className="relative bg-card/50 backdrop-blur-sm border border-border rounded-xl p-6 md:p-8">
-              <h3 className="text-xl font-bold mb-6">Send Us a Message</h3>
+              <h3 className="text-xl font-bold mb-6">Drop Us a Line</h3>
 
               {isSubmitted ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="bg-primary/10 p-4 rounded-full mb-4">
                     <CheckCircle className="h-12 w-12 text-primary" />
                   </div>
-                  <h4 className="text-xl font-bold mb-2">Message Sent!</h4>
-                  <p className="text-muted-foreground">Thank you for contacting us. We&apos;ll get back to you shortly.</p>
+                  <h4 className="text-xl font-bold mb-2">Got it!</h4>
+                  <p className="text-muted-foreground">Thanks for reaching out — we’ll reply soon.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -129,7 +128,7 @@ export default function ContactSection() {
                       <Input
                         name="email"
                         type="email"
-                        placeholder="Your Email"
+                        placeholder="Your Best Email"
                         value={formData.email}
                         onChange={handleChange}
                         required
@@ -139,7 +138,7 @@ export default function ContactSection() {
                     <div>
                       <Input
                         name="phone"
-                        placeholder="Your Phone"
+                        placeholder="Your Phone (optional)"
                         value={formData.phone}
                         onChange={handleChange}
                         className="bg-card/50 border-border focus:border-primary"
