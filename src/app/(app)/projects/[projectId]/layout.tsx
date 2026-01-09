@@ -20,8 +20,8 @@ export default async function ProjectLayout({
     { title: "Epics & Stories", href: `/projects/${projectId}/epics`, icon: <ListTodo /> },
     { title: "Roadmap", href: `/projects/${projectId}/roadmap`, icon: <Map /> },
     { title: "Assumptions & Risks", href: `/projects/${projectId}/assumptions`, icon: <ShieldCheck /> },
-    { title: "Members", href: `/projects/${projectId}/members`, icon: <Users /> },
-    { title: "Settings", href: `/projects/${projectId}/settings`, icon: <Settings /> },
+    // { title: "Members", href: `/projects/${projectId}/members`, icon: <Users /> },
+    // { title: "Settings", href: `/projects/${projectId}/settings`, icon: <Settings /> },
   ];
 
   const session = await getServerSession(authOptions);
