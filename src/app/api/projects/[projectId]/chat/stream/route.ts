@@ -4,6 +4,7 @@ import { authOptions } from '@/backend/modules/presentation/auth/handlers';
 import { getOwnedProjectByEmail } from '@/backend/modules/presentation/project/handlers';
 import { z } from 'zod';
 import { chatOrchestrate } from '@/backend/modules/presentation/chat/handlers';
+import { ARTIFACTS, findArtifactById } from '@/backend/modules/presentation/chat/artifacts';
 import { ChatPrismaRepo } from '@/backend/modules/infrastructure/chat/prisma/repo';
 
 const bodySchema = z.object({
@@ -107,6 +108,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
           return arr[step - 1] ?? null;
         };
 
+        const detectArtifactFromText = (s: string) => {
+          const text = s || '';
+          const a = (ARTIFACTS as ReadonlyArray<{ id: string; detect: (t: string) => boolean }>).find(x => x.detect(text));
+          return a?.id ?? null;
+        };
+        const wantsSaveArtifact = (s: string): string | null => {
+          const m = (s || '').trim().toLowerCase();
+          if (!m) return null;
+          const ids = (ARTIFACTS as ReadonlyArray<{ id: string }>).map(a => a.id);
+          const saveCmd = m.match(new RegExp(`^\\/?save\\s+(${ids.join('|')})s?\\b`));
+          if (saveCmd) {
+            const k = saveCmd[1].replace(/s$/, '');
+            return k;
+          }
+          if (/\bsave\b/.test(m)) {
+            const cfg = findArtifactById(meta.phase);
+            if (cfg) return cfg.id;
+          }
+          return null;
+        };
+
         // Mutate meta by command
         const persistMeta = async (nextMeta: PhaseMeta) => {
           await repo.updateMeta(threadId!, nextMeta);
@@ -118,6 +140,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
         if (cmd === 'brainstorm' && isPhase(arg)) {
           const next: PhaseMeta = { phase: arg as PhaseMeta['phase'], step: 1, answers: {} };
           await persistMeta(next);
+        } else if (cmd && isPhase(cmd)) {
+          // Treat direct commands like /brief, /scope, /epics, /stories, /roadmap, /risks as phase starters
+          const next: PhaseMeta = { phase: cmd as PhaseMeta['phase'], step: 1, answers: {} };
+          await persistMeta(next);
+        } else if (!cmd) {
+          // Fallback: detect "Topic: <phase>" inside expanded messages from client brainstorm helper
+          const topic = lastUserText.match(/topic:\s*(brief|scope|epics?|stories|roadmap|risks)/i)?.[1]?.toLowerCase();
+          if (isPhase(topic)) {
+            const normalized = (topic as string).replace('epic', 'epics') as PhaseMeta['phase'];
+            const next: PhaseMeta = { phase: normalized, step: 1, answers: {} };
+            await persistMeta(next);
+          }
         } else if (cmd === 'next' && isPhase(meta.phase)) {
           const max = stepsByPhase[meta.phase as string];
           const step = Math.min((meta.step ?? 1) + 1, max);
@@ -313,6 +347,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
             }
             await persistMeta({ ...meta, answers });
           }
+        } else {
+          const saveKind = wantsSaveArtifact(lastUserText);
+          if (saveKind || /\bsave\b/i.test(lastUserText)) {
+            // Build a deterministic proposal to save the latest assistant draft
+          let candidate = '';
+          try {
+            const history = await repo.listMessages(threadId!);
+            const lastAssistant = [...history].reverse().find(m => m.role === 'assistant' && typeof m.content === 'string');
+            candidate = (lastAssistant?.content ?? '').trim();
+          } catch {}
+          if (!candidate) {
+            const prevAssistant = [...(parsed.data.messages as Array<{ role: string; content: string }>)].reverse().find(m => m.role === 'assistant');
+            candidate = (prevAssistant?.content ?? '').trim();
+          }
+          if (candidate) {
+            const kindFromMsg = saveKind ? findArtifactById(saveKind)?.id : null;
+            const inferred = kindFromMsg ?? detectArtifactFromText(candidate) ?? findArtifactById(meta.phase)?.id ?? 'brief';
+            const cfg = findArtifactById(inferred);
+            const proposals = cfg ? [cfg.saveProposal(candidate)] : [];
+            write({ type: 'data-finish', text: `Ready to save your ${cfg?.id ?? 'document'}.` });
+            write({ type: 'data-proposals', proposals });
+            controller.close();
+            return;
+          }
+          }
         }
 
         const messagesWithMeta = [
@@ -325,7 +384,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
           write({ type: 'data-delta', delta });
         });
         const parsedOut = parseChatJson(result?.raw ?? '');
-        const text: string = (parsedOut?.text ?? result?.raw ?? fullText);
+        let text: string = (parsedOut?.text ?? result?.raw ?? fullText);
         // persist assistant message (use parsed text if present, otherwise accumulated)
         await repo.addMessage(threadId!, 'assistant', text);
         // auto-title if thread has no title
@@ -342,7 +401,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
         const userMsgs = (parsed.data.messages as Array<{ role: string; content: string }>).filter(m => m.role === 'user');
         const lastUser = userMsgs[userMsgs.length - 1]?.content ?? '';
         const proposalsRaw = (parsedOut?.proposals as unknown[] | undefined) ?? [];
-        const proposals = shouldAllowProposals(lastUser) ? proposalsRaw : [];
+        const phaseActive = isPhase(meta.phase);
+        const proposals = phaseActive
+          ? (cmd === 'confirm' ? proposalsRaw : [])
+          : (shouldAllowProposals(lastUser) ? proposalsRaw : []);
+        // Gentle CTA: if the content looks like a Brief, suggest saving explicitly
+        const detectedId = detectArtifactFromText(text);
+        if (detectedId && proposals.length === 0) {
+          const cfg = findArtifactById(detectedId);
+          if (cfg?.cta) text = `${text}\n\n${cfg.cta}`;
+        }
         write({ type: 'data-finish', text });
         write({ type: 'data-proposals', proposals });
         controller.close();

@@ -57,6 +57,13 @@ export async function getProjectScopeHandler(projectId: number) {
   return { document: doc } as const;
 }
 
+export async function updateProjectScopeHandler(projectId: number, contentMd: string) {
+  const existing = await documentRepo.getByType(projectId, 'PROJECT_SCOPE');
+  const title = existing?.title ?? "Scope & Features";
+  const saved = await documentRepo.upsertByType(projectId, 'PROJECT_SCOPE', title, contentMd);
+  return { document: saved } as const;
+}
+
 export async function generateProjectScopeHandler(projectId: number, payload: {
   name: string;
   goals?: string;

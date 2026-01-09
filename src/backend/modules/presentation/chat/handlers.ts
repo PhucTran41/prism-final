@@ -1,6 +1,6 @@
 import { AiSdkService } from '@/src/backend/modules/infrastructure/ai/aiSdkService';
 import { buildPromptFromTemplate, loadTemplate } from '@/src/backend/ai';
-import { updateProjectBriefHandler, generateProjectBriefHandler, generateProjectScopeHandler } from '@/src/backend/modules/presentation/document/handlers';
+import { updateProjectBriefHandler, generateProjectBriefHandler, generateProjectScopeHandler, updateProjectScopeHandler, updateAssumptionsRisksHandler } from '@/src/backend/modules/presentation/document/handlers';
 import { generateEpics, saveEpics, generateStories, saveStories, generateRoadmap, saveRoadmap } from '@/src/backend/modules/presentation/planning/handlers';
 import { DocumentPrismaRepo } from '@/src/backend/modules/infrastructure/document/prisma/repo';
 import { ProjectPrismaRepo } from '@/src/backend/modules/infrastructure/project/prisma/repo';
@@ -21,12 +21,14 @@ export type ChatProposal =
   | { kind: 'brief.update'; payload: { contentMd: string; mode?: 'overwrite'|'newVersion' } }
   | { kind: 'brief.generate'; payload: { name: string; problem?: string; targetUser?: string; goals?: string; constraints?: string } }
   | { kind: 'scope.generate'; payload: { name: string; goals?: string; must?: string; should?: string; could?: string; non_goals?: string } }
+  | { kind: 'scope.update'; payload: { contentMd: string; mode?: 'overwrite'|'newVersion' } }
   | { kind: 'epics.generate'; payload: { name: string; strictness?: 'normal'|'strict' } }
   | { kind: 'epics.save'; payload: { items: Array<{ id?: number; title: string; priority?: string|null; status?: string|null }> } }
   | { kind: 'stories.generate'; payload: { name: string; epicTitles?: string[]; strictness?: 'normal'|'strict' } }
   | { kind: 'stories.save'; payload: { items: Array<{ id?: number; epicId?: number|null; title: string; acceptance?: string|null; priority?: string|null; status?: string|null; startDate?: string|null; endDate?: string|null }> } }
   | { kind: 'roadmap.generate'; payload: { name: string; cadence?: 'weekly'|'monthly'|'quarterly'; horizonMonths?: number; startDate?: string; teamSize?: number; workDaysPerWeek?: number; velocityPointsPerSprint?: number; includeStorySchedule?: boolean; holidayDatesCsv?: string; releaseMilestones?: string } }
-  | { kind: 'roadmap.save'; payload: { items: Array<Record<string, unknown>> } };
+  | { kind: 'roadmap.save'; payload: { items: Array<Record<string, unknown>> } }
+  | { kind: 'risks.update'; payload: { contentMd: string; mode?: 'overwrite'|'newVersion' } };
 
 export async function chatOrchestrate(projectId: number, messages: ChatMessage[], onDelta?: (delta: string) => void) {
   const system = (await loadTemplate('system/default.yml')).template;
@@ -120,14 +122,36 @@ export async function chatApply(projectId: number, proposal: ChatProposal) {
     case 'scope.generate': {
       return await generateProjectScopeHandler(projectId, { name: proposal.payload.name, goals: proposal.payload.goals, must: proposal.payload.must, should: proposal.payload.should, could: proposal.payload.could, non_goals: proposal.payload.non_goals });
     }
+    case 'scope.update': {
+      return await updateProjectScopeHandler(projectId, proposal.payload.contentMd);
+    }
     case 'epics.generate': {
-      return await generateEpics(projectId, { name: proposal.payload.name, strictness: proposal.payload.strictness ?? 'normal' });
+      // Generate first, then persist so Apply has an effect
+      const gen = await generateEpics(projectId, {
+        name: proposal.payload.name,
+        strictness: proposal.payload.strictness ?? 'normal',
+      });
+      const items: unknown[] = Array.isArray((gen as { epics?: unknown[] } | null)?.epics)
+        ? ((gen as { epics?: unknown[] }).epics as unknown[])
+        : [];
+      if (items.length === 0) return gen;
+      return await saveEpics(projectId, items as unknown as never);
     }
     case 'epics.save': {
       return await saveEpics(projectId, proposal.payload.items as unknown as never);
     }
     case 'stories.generate': {
-      return await generateStories(projectId, { name: proposal.payload.name, epicTitles: proposal.payload.epicTitles, strictness: proposal.payload.strictness ?? 'normal' });
+      // Generate first, then persist so Apply has an effect
+      const gen = await generateStories(projectId, {
+        name: proposal.payload.name,
+        epicTitles: proposal.payload.epicTitles,
+        strictness: proposal.payload.strictness ?? 'normal',
+      });
+      const items: unknown[] = Array.isArray((gen as { stories?: unknown[] } | null)?.stories)
+        ? ((gen as { stories?: unknown[] }).stories as unknown[])
+        : [];
+      if (items.length === 0) return gen;
+      return await saveStories(projectId, items as unknown as never);
     }
     case 'stories.save': {
       return await saveStories(projectId, proposal.payload.items as unknown as never);
@@ -148,6 +172,9 @@ export async function chatApply(projectId: number, proposal: ChatProposal) {
     }
     case 'roadmap.save': {
       return await saveRoadmap(projectId, proposal.payload.items as unknown as never);
+    }
+    case 'risks.update': {
+      return await updateAssumptionsRisksHandler(projectId, proposal.payload.contentMd);
     }
     default:
       return { error: 'Unsupported proposal' };

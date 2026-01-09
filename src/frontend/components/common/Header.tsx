@@ -62,7 +62,7 @@ export function Header({ projectName }: HeaderProps) {
       <div className="mx-auto w-full px-4 flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center text-primary" aria-label="Prism Home">
-            <PrismLogo size={24} withWordmark />
+            <PrismLogo size={32} withWordmark wordmarkClassName="text-lg font-semibold tracking-tight"/>
           </Link>
           {/* Project name should appear in AppSidebar header, not here */}
           
