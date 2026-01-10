@@ -157,7 +157,8 @@ export async function chatApply(projectId: number, proposal: ChatProposal) {
       return await saveStories(projectId, proposal.payload.items as unknown as never);
     }
     case 'roadmap.generate': {
-      return await generateRoadmap(projectId, {
+      // Generate first, then persist so Apply has an effect
+      const gen = await generateRoadmap(projectId, {
         name: proposal.payload.name,
         cadence: proposal.payload.cadence,
         horizonMonths: proposal.payload.horizonMonths,
@@ -169,6 +170,11 @@ export async function chatApply(projectId: number, proposal: ChatProposal) {
         holidayDatesCsv: proposal.payload.holidayDatesCsv,
         releaseMilestones: proposal.payload.releaseMilestones,
       });
+      const items: unknown[] = Array.isArray((gen as { items?: unknown[] } | null)?.items)
+        ? ((gen as { items?: unknown[] }).items as unknown[])
+        : [];
+      if (items.length === 0) return gen;
+      return await saveRoadmap(projectId, items as unknown as never);
     }
     case 'roadmap.save': {
       return await saveRoadmap(projectId, proposal.payload.items as unknown as never);

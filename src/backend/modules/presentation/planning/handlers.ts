@@ -69,6 +69,29 @@ export async function listStories(projectId: number) {
 export async function saveStories(projectId: number, items: StoryUpsertInput[]) {
   // Avoid duplicates by collapsing on (epicId,title) and linking to existing ids
   const existing = await storyRepo.list(projectId);
+  // Map epic titles → ids when present in raw items (e.g., from AI)
+  try {
+    const epics = await epicRepo.list(projectId) as Array<{ id: number; title: string }>;
+    const titleToId = new Map<string, number>();
+    for (const e of epics) titleToId.set(String(e.title ?? '').trim().toLowerCase(), e.id);
+    // Mutate a shallow copy so callers aren't surprised
+    const remapped: Array<Record<string, unknown>> = (items as unknown[]).map((raw: unknown) => {
+      const it = (raw ?? {}) as Record<string, unknown>;
+      const currentEpicId = it.epicId;
+      if (currentEpicId == null) {
+        const by1 = String(it.epic ?? '').trim().toLowerCase();
+        const by2 = String((it as Record<string, unknown>).epicTitle ?? '').trim().toLowerCase();
+        const by3 = String((it as Record<string, unknown>).epic_name ?? '').trim().toLowerCase();
+        const chosen = titleToId.get(by1) ?? titleToId.get(by2) ?? titleToId.get(by3);
+        if (chosen) it.epicId = chosen;
+      }
+      return it;
+    });
+    // Replace items reference for downstream normalization
+    items = remapped as unknown as StoryUpsertInput[];
+  } catch {
+    // If mapping fails for any reason, continue with original items
+  }
   const keyOf = (epicId: number | null, title: string) => `${epicId ?? 0}|${title.trim().toLowerCase()}`;
   const existingMap = new Map<string, number>();
   for (const s of existing as Array<{ id: number; epicId: number | null; title: string }>) {
