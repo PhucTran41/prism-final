@@ -8,6 +8,7 @@ import { useInView } from "react-intersection-observer";
 import Image from "next/image";
 import Link from "next/link";
 import { InfiniteGridBackground } from "@/src/frontend/components/ui/infinite-grid";
+import { useSession } from "next-auth/react";
 
 export default function HeroSection() {
   const [ref, inView] = useInView({
@@ -17,6 +18,8 @@ export default function HeroSection() {
 
   const controls = useAnimation();
   const [isLoaded, setIsLoaded] = useState(false);
+  const { status } = useSession();
+  const ctaHref = status === "authenticated" ? "/projects" : "/login";
 
   useEffect(() => {
     if (inView) {
@@ -114,7 +117,7 @@ export default function HeroSection() {
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <Link href="/signin">
+              <Link href={ctaHref}>
                 <Button
                   size="lg"
                   className="bg-primary hover:bg-primary/90 text-white group"
